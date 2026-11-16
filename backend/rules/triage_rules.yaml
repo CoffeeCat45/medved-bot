@@ -1,0 +1,38 @@
+# Правила категория-врач
+categories:
+  боль:
+    specialist: "Терапевт"
+    place: "Поликлиника"
+    urgency: "Планово"
+  температура:
+    specialist: "Терапевт"
+    place: "Поликлиника"
+    urgency: "Срочно (24ч)"
+  дыхание:
+    specialist: "Пульмонолог"
+    place: "Поликлиника"
+    urgency: "Срочно (24ч)"
+  жкт:
+    specialist: "Гастроэнтеролог"
+    place: "Поликлиника"
+    urgency: "Планово"
+  кожа:
+    specialist: "Дерматолог"
+    place: "Поликлиника"
+    urgency: "Планово"
+  неврология:
+    specialist: "Невролог"
+    place: "Поликлиника"
+    urgency: "Планово"
+  травма:
+    specialist: "Травматолог"
+    place: "Приемный покой"
+    urgency: "Срочно (24ч)"
+
+# Модификаторы
+modifiers:
+  child:
+    specialist: "Педиатр"
+    urgency: "Срочно (24ч)"
+  pregnant:
+    urgency: "Срочно (24ч)"

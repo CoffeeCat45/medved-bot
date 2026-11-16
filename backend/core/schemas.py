@@ -41,7 +41,8 @@ class TriageResult(BaseModel):
     specialist: str = Field(description="К какому врачу идти (Терапевт, Кардиолог...)")
     urgency: Urgency = Field(description="Насколько срочно")
     place: str = Field(description="Куда обращаться (Поликлиника, Скорая...)")
-    reasoning: List[str] = Field(description="Список причин, почему мы так решили (как на макете)")
+    reasoning: List[str] = Field(description="Список причин, почему мы так решили")
     
-    # Дисклеймер, который обязательно должен быть (по ТЗ)
+    # Дисклеймер
     disclaimer: str = Field(default="Бот не ставит диагноз и не заменяет врача. При ухудшении вызывайте 103/112.")
+    

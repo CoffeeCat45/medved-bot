@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel  #для описания данных
 from core.safety import check_safety
+from core.schemas import PatientCase, TriageResult, Urgency
+from core.router import route_patient
 
 app = FastAPI()
 
@@ -39,3 +41,9 @@ async def check_symptoms(req: SymptomRequest):
         "is_emergency": False,
         "message": f"Бэкенд получил текст: '{req.text}'. Критических симптомов не найдено.",
     }
+
+
+
+@app.post("/api/triage", response_model=TriageResult)
+async def get_triage(case:PatientCase):
+    return route_patient(case)
