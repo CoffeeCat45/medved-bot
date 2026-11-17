@@ -5,6 +5,9 @@ from core.safety import check_safety
 from core.schemas import PatientCase, TriageResult, Urgency
 from core.router import route_patient
 
+from fastapi import Header, HTTPException
+
+
 app = FastAPI()
 
 # Настройка CORS (чтобы React мог делать запросы)
@@ -47,3 +50,21 @@ async def check_symptoms(req: SymptomRequest):
 @app.post("/api/triage", response_model=TriageResult)
 async def get_triage(case:PatientCase):
     return route_patient(case)
+
+
+
+@app.get("/api/auth/me")
+async def get_user_data(authorization: str = Header(None)):
+    if not authorization:
+        raise HTTPException(status_code=401, detail="Нет токена")
+    
+    # ЗАГЛУШКА
+    return {
+        "_id": "12345",
+        "full_name": {
+            "lastName": "Иванов",
+            "firstName": "Иван"
+        },
+        "birthDate": "1990-01-01",
+        "phone": "71234567890"
+    }
