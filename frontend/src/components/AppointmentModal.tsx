@@ -24,7 +24,7 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: BACKEND — при необходимости отправить данные записи на сервер друга
+    //BACKEND — при необходимости отправить данные записи
     setIsSuccess(true);
     setTimeout(() => {
       setIsSuccess(false);

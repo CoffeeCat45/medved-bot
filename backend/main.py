@@ -7,6 +7,8 @@ import httpx
 from core.safety import check_safety
 from core.schemas import PatientCase, TriageResult
 from core.router import route_patient
+from core.nlp import extract_symptoms
+from core.llm_client import get_llm_provider
 
 from fastapi import Header, HTTPException
 
@@ -52,6 +54,13 @@ async def check_symptoms(req: SymptomRequest):
 
 @app.post("/api/triage", response_model=TriageResult)
 async def get_triage(case:PatientCase):
+
+    if case.category in ["Общая жалоба", "боль", ""] and case.complaint_text:
+        nlp_result = extract_symptoms(case.complaint_text)
+
+    if nlp_result["category"] != "боль":
+            case.category = nlp_result["category"]
+
     return route_patient(case)
 
 
@@ -76,4 +85,19 @@ async def get_user_data(authorization: str = Header(None)):
                 raise HTTPException(status_code=401, detail="Неверный токен")
         except Exception:
             raise HTTPException(status_code=503, detail="Сервер авторизации недоступен")
-    
+
+@app.post("/api/parse-text")
+async def parse_text(req: SymptomRequest):
+    # берем текст и возвращаем категорию локализацию
+    result = extract_symptoms(req.text)
+    return result
+
+
+@app.post("/api/llm-classify")
+async def llm_classify(req: SymptomRequest):
+    try:
+        provider = get_llm_provider()
+        result = await provider.classify_symptom(req.text) 
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

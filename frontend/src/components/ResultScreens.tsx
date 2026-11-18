@@ -22,7 +22,7 @@ export function getUrgencyClass(urgency: string): string {
 interface FinalProps {
   result: TriageResult;
   paymentPref: PaymentType;
-  setPaymentPref: (v: PaymentType) => void;
+  onPaymentChange: (v: PaymentType) => void;
   onOpenModal: () => void;
   onReset: () => void;
   onOpenHistory: () => void;
@@ -31,7 +31,7 @@ interface FinalProps {
 export const FinalScreen: React.FC<FinalProps> = ({
   result,
   paymentPref,
-  setPaymentPref,
+  onPaymentChange,
   onOpenModal,
   onReset,
   onOpenHistory,
@@ -64,7 +64,7 @@ export const FinalScreen: React.FC<FinalProps> = ({
       <span>Форма обращения:</span>
       <select
         value={paymentPref}
-        onChange={(e) => setPaymentPref(e.target.value as PaymentType)}
+        onChange={(e) => onPaymentChange(e.target.value as PaymentType)}
         className="payment-select-inline"
       >
         <option value="ОМС">ОМС (бесплатно)</option>

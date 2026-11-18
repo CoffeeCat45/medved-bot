@@ -200,6 +200,18 @@ export function App() {
     }
   };
 
+  const handlePaymentChange = (newPref: PaymentType) => {
+    setPaymentPref(newPref);
+    if (result) {
+      let newPlace = result.place;
+      if (newPref === "Платно") newPlace = "Частная клиника";
+      else if (newPref === "ДМС") newPlace = "Клиника по ДМС";
+      else if (newPref === "ОМС") newPlace = isChild ? "Детская поликлиника" : "Поликлиника";
+      
+      setResult({ ...result, place: newPlace });
+    }
+  };
+
   const handleReset = () => {
     setCategory("");
     setComplaintText("");
@@ -383,7 +395,7 @@ export function App() {
           <FinalScreen
             result={result}
             paymentPref={paymentPref}
-            setPaymentPref={setPaymentPref}
+            onPaymentChange={handlePaymentChange}
             onOpenModal={() => setIsModalOpen(true)}
             onReset={handleReset}
             onOpenHistory={() => setScreen("history")}
@@ -419,6 +431,7 @@ export function App() {
       )}
     </div>
   );
+  
 }
 
 export default App;

@@ -37,7 +37,7 @@ def route_patient(case: PatientCase) -> TriageResult:
     if case.payment_preference:
         if case.payment_preference.value == "Платно":
             place = "Частная клиника"
-            reasons.append("Вы выбрали платную медецину")
+            reasons.append("Вы выбрали платную медицину")
         elif case.payment_preference.value == "ДМС":
             place = "Клиника по ДМС"
             reasons.append("Вы указали полис ДМС")
