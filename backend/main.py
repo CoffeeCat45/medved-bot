@@ -1,13 +1,16 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel  #для описания данных
+import httpx
+
+
 from core.safety import check_safety
-from core.schemas import PatientCase, TriageResult, Urgency
+from core.schemas import PatientCase, TriageResult
 from core.router import route_patient
 
 from fastapi import Header, HTTPException
 
-
+CORE_URL = "https://tm-test-yakut.hostco.ru"
 app = FastAPI()
 
 # Настройка CORS (чтобы React мог делать запросы)
@@ -24,7 +27,7 @@ app.add_middleware(
 async def health_check():
     return {"status": "ok", "message": "Бэкенд работает!"}
 
-# Класс наследуется от BaseModel, значит Pydantic будет автоматически проверять типы.
+
 class SymptomRequest(BaseModel):
     text: str  # ожидаем JSON вида: {"text": "болит голова"}
 
@@ -42,7 +45,7 @@ async def check_symptoms(req: SymptomRequest):
         }
     return {
         "is_emergency": False,
-        "message": f"Бэкенд получил текст: '{req.text}'. Критических симптомов не найдено.",
+        "message": "Критических симптомов не найдено.",
     }
 
 
@@ -55,16 +58,22 @@ async def get_triage(case:PatientCase):
 
 @app.get("/api/auth/me")
 async def get_user_data(authorization: str = Header(None)):
-    if not authorization:
+    if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Нет токена")
     
-    # ЗАГЛУШКА
-    return {
-        "_id": "12345",
-        "full_name": {
-            "lastName": "Иванов",
-            "firstName": "Иван"
-        },
-        "birthDate": "1990-01-01",
-        "phone": "71234567890"
-    }
+    token = authorization.split(" ")[1]
+
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.get(
+                f"{CORE_URL}/api/v3/users/user-for-external-service",
+                params={"token":token},
+                timeout=10.0
+            )
+            if response.status_code == 200:
+                return response.json()
+            else:
+                raise HTTPException(status_code=401, detail="Неверный токен")
+        except Exception:
+            raise HTTPException(status_code=503, detail="Сервер авторизации недоступен")
+    

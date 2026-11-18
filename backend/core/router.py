@@ -22,7 +22,7 @@ def route_patient(case: PatientCase) -> TriageResult:
     place = base_rule["place"]
     urgency_str = base_rule["urgency"]
 
-    reasons.append(f"Вы указали жалобу ил категории '{case.category}'")
+    reasons.append(f"Вы указали жалобу из категории '{case.category}'")
 
     # 3 проверяем модификаторы
     if case.is_child:
@@ -33,6 +33,15 @@ def route_patient(case: PatientCase) -> TriageResult:
     if case.is_pregnant:
         urgency_str = TRIAGE_RULES["modifiers"]["pregnant"]["urgency"]
         reasons.append("Пациентка беременна/кормит грудью, требуется повышенное внимание")
+
+    if case.payment_preference:
+        if case.payment_preference.value == "Платно":
+            place = "Частная клиника"
+            reasons.append("Вы выбрали платную медецину")
+        elif case.payment_preference.value == "ДМС":
+            place = "Клиника по ДМС"
+            reasons.append("Вы указали полис ДМС")
+
 
     # 4 добавляем хронические болезни
     if case.chronic_diseases:

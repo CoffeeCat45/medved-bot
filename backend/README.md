@@ -29,3 +29,4 @@
 
 ## Git (Сохранение изменений)
 - Сохранить изменения: `git add .` -> `git commit -m "что сделал"` -> `git push`
+- Вытянуть: `git pull origin main` ``
