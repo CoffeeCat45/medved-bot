@@ -53,13 +53,23 @@ async def check_symptoms(req: SymptomRequest):
 
 
 @app.post("/api/triage", response_model=TriageResult)
-async def get_triage(case:PatientCase):
-
+async def get_triage(case: PatientCase):
+    # Если категория размыта пытаемся вытащить её из текста
     if case.category in ["Общая жалоба", "боль", ""] and case.complaint_text:
-        nlp_result = extract_symptoms(case.complaint_text)
-
-    if nlp_result["category"] != "боль":
-            case.category = nlp_result["category"]
+        try:
+            # 1 умную LLM
+            provider = get_llm_provider()
+            llm_result = await provider.classify_symptom(case.complaint_text)
+            new_cat = llm_result["category"].lower().strip() 
+            
+            # Если GigaChat не ошибся и не выдал "терапевт" (по умолчанию), берем его ответ
+            if new_cat not in ["терапевт", "unknown"]:
+                case.category = new_cat
+        except Exception:
+            # 2 Если GigaChat недоступен используем NLP
+            nlp_result = extract_symptoms(case.complaint_text)
+            if nlp_result["category"] != "боль":
+                case.category = nlp_result["category"]
 
     return route_patient(case)
 
