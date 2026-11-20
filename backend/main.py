@@ -1,113 +1,157 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel  #для описания данных
-import httpx
+import asyncio
+import logging
+import os
 
+import httpx
+from fastapi import FastAPI, Header, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 from core.safety import check_safety
-from core.schemas import PatientCase, TriageResult
-from core.router import route_patient
+from core.schemas import (
+    PatientCase, TriageResult, SymptomRequest, SymptomCheckResult,
+    UserProfile, FullName,
+)
+from core.router import route_patient, TRIAGE_RULES
 from core.nlp import extract_symptoms
 from core.llm_client import get_llm_provider
 
-from fastapi import Header, HTTPException
 
-CORE_URL = "https://tm-test-yakut.hostco.ru"
-app = FastAPI()
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+CORE_URL = os.getenv("CORE_URL", "https://tm-test-yakut.hostco.ru").rstrip("/")
+LLM_TIMEOUT = float(os.getenv("LLM_TIMEOUT", "8"))
+ALLOWED_ORIGINS = [o.strip() for o in os.getenv(
+    "ALLOWED_ORIGINS",
+    "https://coffeecat45.github.io,http://localhost:5173,http://127.0.0.1:5173",
+).split(",") if o.strip()]
+
+app = FastAPI(title="Медведь онлайн", version="1.0.0")
+
 
 # Настройка CORS (чтобы React мог делать запросы)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=ALLOWED_ORIGINS,
+    allow_credentials=False,   # Bearer-токен, не куки
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type"],
+    max_age=600,
 )
+
 
 
 @app.get("/api/health")
 async def health_check():
-    return {"status": "ok", "message": "Бэкенд работает!"}
+    return {"status": "ok", "message": "Бэкенд работает"}
 
+@app.post("/api/check-symptoms", response_model=SymptomCheckResult)
+async def check_symptoms(req: SymptomRequest):
+    safety_result = check_safety(req.text, is_child=req.is_child)
 
-class SymptomRequest(BaseModel):
-    text: str  # ожидаем JSON вида: {"text": "болит голова"}
-
-
-@app.post("/api/check-symptoms")
-
-async def check_symptoms(req: SymptomRequest): 
-    safety_result = check_safety(req.text)
-    
     if safety_result.is_emergency:
-        return {
-            "is_emergency": True,
-            "message": safety_result.instruction,
-            "matched_rule": safety_result.matched_rule
-        }
-    return {
-        "is_emergency": False,
-        "message": "Критических симптомов не найдено.",
-    }
-
+        return SymptomCheckResult(
+            is_emergency=True,
+            message=safety_result.instruction,
+            matched_rule=safety_result.matched_rule or "",
+        )
+    return SymptomCheckResult(
+        is_emergency=False,
+        message="Критических симптомов не найдено.",
+        matched_rule="",
+    )
 
 
 @app.post("/api/triage", response_model=TriageResult)
 async def get_triage(case: PatientCase):
+    # 0 Слой безопасности до LLM: нейросеть не должна задерживать красный экран
+    safety = check_safety(
+        " ".join(p for p in [case.complaint_text, case.localization] if p),
+        is_child=case.is_child,
+    )
+    if safety.is_emergency:
+        return route_patient(case)
+
     # Если категория размыта пытаемся вытащить её из текста
-    if case.category in ["Общая жалоба", "боль", ""] and case.complaint_text:
+    if case.category.lower().strip() in ["общая жалоба", "боль", ""] and case.complaint_text:
+        allowed = set(TRIAGE_RULES["categories"].keys())
         try:
             # 1 умную LLM
             provider = get_llm_provider()
-            llm_result = await provider.classify_symptom(case.complaint_text)
-            new_cat = llm_result["category"].lower().strip() 
-            
-            # Если GigaChat не ошибся и не выдал "терапевт" (по умолчанию), берем его ответ
-            if new_cat not in ["терапевт", "unknown"]:
+            llm_result = await asyncio.wait_for(
+                provider.classify_symptom(case.complaint_text), timeout=LLM_TIMEOUT
+            )
+            new_cat = str(llm_result.get("category", "")).lower().strip()
+
+            # берем ответ только если это реальная категория из yaml
+            if new_cat in allowed:
                 case.category = new_cat
         except Exception:
             # 2 Если GigaChat недоступен используем NLP
+            logger.warning("LLM недоступен, включаем NLP fallback")
             nlp_result = extract_symptoms(case.complaint_text)
-            if nlp_result["category"] != "боль":
-                case.category = nlp_result["category"]
+            new_cat = str(nlp_result.get("category", "")).lower().strip()
+            if new_cat in allowed:
+                case.category = new_cat
 
     return route_patient(case)
 
 
-
-@app.get("/api/auth/me")
+@app.get("/api/auth/me", response_model=UserProfile)
 async def get_user_data(authorization: str = Header(None)):
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Нет токена")
-    
-    token = authorization.split(" ")[1]
 
-    async with httpx.AsyncClient() as client:
-        try:
+    token = authorization.removeprefix("Bearer ").strip()
+    if not token:
+        raise HTTPException(status_code=401, detail="Пустой токен")
+
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
             response = await client.get(
                 f"{CORE_URL}/api/v3/users/user-for-external-service",
-                params={"token":token},
-                timeout=10.0
+                params={"token": token},
+                headers={"Authorization": f"Bearer {token}"},
             )
-            if response.status_code == 200:
-                return response.json()
-            else:
-                raise HTTPException(status_code=401, detail="Неверный токен")
-        except Exception:
-            raise HTTPException(status_code=503, detail="Сервер авторизации недоступен")
+    except httpx.RequestError as exc:
+        # только сетевые ошибки
+        logger.error("CORE недоступен: %s", type(exc).__name__)
+        raise HTTPException(status_code=503, detail="Сервер авторизации недоступен")
+
+    if response.status_code in (401, 403):
+        raise HTTPException(status_code=401, detail="Токен недействителен или истёк")
+    if response.status_code != 200:
+        logger.error("CORE вернул статус %s", response.status_code)
+        raise HTTPException(status_code=502, detail=f"Ошибка сервиса авторизации: {response.status_code}")
+
+    data = response.json()
+    # Минимизация ПД
+    name = data.get("full_name") or {}
+    return UserProfile(
+        full_name=FullName(
+            lastName=name.get("lastName", ""),
+            firstName=name.get("firstName", ""),
+            middleName=name.get("middleName", ""),
+        ),
+        birthDate=data.get("birthDate", ""),
+        phone=data.get("phone", ""),
+    )
+
 
 @app.post("/api/parse-text")
 async def parse_text(req: SymptomRequest):
     # берем текст и возвращаем категорию локализацию
-    result = extract_symptoms(req.text)
-    return result
+    return extract_symptoms(req.text)
 
 
 @app.post("/api/llm-classify")
 async def llm_classify(req: SymptomRequest):
     try:
         provider = get_llm_provider()
-        result = await provider.classify_symptom(req.text) 
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        return await asyncio.wait_for(provider.classify_symptom(req.text), timeout=LLM_TIMEOUT)
+    except asyncio.TimeoutError:
+        raise HTTPException(status_code=504, detail="LLM не ответила вовремя")
+    except Exception as exc:
+        logger.error("LLM ошибка: %s", type(exc).__name__)
+        raise HTTPException(status_code=502, detail="LLM недоступен")

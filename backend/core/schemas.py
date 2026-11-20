@@ -15,6 +15,30 @@ class PaymentType(str, Enum):
     PAID = "Платно"
 
 
+class SymptomRequest(BaseModel):
+    text: str = Field(description="Свободный текст пациента")
+    is_child: bool = Field(default=False, description="Пациент — ребенок (для порога температуры)")
+
+
+class SymptomCheckResult(BaseModel):
+    is_emergency: bool = Field(description="Найден критический признак")
+    message: str = Field(default="", description="Инструкция для пациента")
+    matched_rule: str = Field(default="", description="Какое правило сработало")
+
+
+class FullName(BaseModel):
+    lastName: str = ""
+    firstName: str = ""
+    middleName: str = ""
+
+
+class UserProfile(BaseModel):
+    # Минимизация ПДн: СНИЛС, ОМС и _id сюда НЕ попадают
+    full_name: FullName = Field(default_factory=FullName)
+    birthDate: str = ""
+    phone: str = ""
+
+
 class PatientCase (BaseModel):
     # 1 шаг жалобы
     category: str = Field(description="Категория: боль, температура, дыхание...")
@@ -42,7 +66,14 @@ class TriageResult(BaseModel):
     urgency: Urgency = Field(description="Насколько срочно")
     place: str = Field(description="Куда обращаться (Поликлиника, Скорая...)")
     reasoning: List[str] = Field(description="Список причин, почему мы так решили")
+
+    # Красный флаг, найденный на сервере (фронт рисует красный экран)
+    is_emergency: bool = Field(default=False, description="Маршрутизация прервана красным флагом")
+    instruction: str = Field(default="", description="Экстренная инструкция")
+
+    # Самопомощь: только уход, без препаратов
+    self_care: List[str] = Field(default_factory=list, description="Разрешенные советы по уходу")
+    stop_signals: List[str] = Field(default_factory=list, description="Когда прекратить самолечение")
     
     # Дисклеймер
     disclaimer: str = Field(default="Бот не ставит диагноз и не заменяет врача. При ухудшении вызывайте 103/112.")
-    

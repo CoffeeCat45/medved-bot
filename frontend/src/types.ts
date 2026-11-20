@@ -41,3 +41,28 @@ export interface EmergencyAlert {
   message: string;
   matched_rule: string;
 }
+
+export interface UserProfile {
+  full_name: { lastName: string; firstName: string; middleName?: string };
+  birthDate: string;
+  phone: string;
+}
+
+export interface EmergencyAlert {
+  is_emergency: boolean;
+  message: string;
+  matched_rule: string;
+  source?: "server" | "local";   // local → показать бейдж «Офлайн-проверка»
+}
+
+export interface TriageResult {
+  specialist: string;
+  urgency: "Экстренно" | "Срочно (24ч)" | "Планово" | "Самопомощь";
+  place: string;
+  reasoning: string[];
+  disclaimer: string;
+  is_emergency?: boolean;        // бэкенд сам нашёл красный флаг
+  instruction?: string;
+  self_care?: string[];
+  stop_signals?: string[];
+}
