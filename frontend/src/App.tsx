@@ -30,23 +30,7 @@ type ScreenStep =
   | "history"
   | "emergency";
 
-const INITIAL_HISTORY: HistoryItem[] = [
-  {
-    id: "1",
-    date: "30.09.2026  09:25",
-    specialist: "кардиологу",
-    urgency: "Срочно (24ч)",
-    symptomsSummary: "температура 38°C, боль в горле, ломота в теле",
-  },
-  {
-    id: "2",
-    date: "01.07.2026  12:31",
-    specialist: "выпить обезболивающее",
-    urgency: "Самопомощь",
-    symptomsSummary: "легкая боль в голове",
-  },
-];
-
+  
 export function App() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [screen, setScreen] = useState<ScreenStep>("start");
@@ -77,8 +61,13 @@ export function App() {
   const [paymentPref, setPaymentPref] = useState<PaymentType>("Платно");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [history, setHistory] = useState<HistoryItem[]>(() => {
-    const saved = localStorage.getItem("medved_history");
-    return saved ? JSON.parse(saved) : INITIAL_HISTORY;
+  const saved = localStorage.getItem("medved_history_v2");
+    if (!saved) return [];
+    try {
+      return JSON.parse(saved);
+    } catch {
+      return [];
+    }
   });
 
   useEffect(() => {
@@ -140,7 +129,7 @@ export function App() {
   ) => {
     setIsLoading(true);
     try {
-      const alertData = await checkRedFlags(textToCheck);
+      const alertData = await checkRedFlags(textToCheck, isChild);
       if (alertData.is_emergency) {
         setEmergencyAlert(alertData);
         setPreviousScreen(screen);
@@ -153,63 +142,63 @@ export function App() {
     }
   };
 
-  const handleFinishTriage = async () => {
-    setIsLoading(true);
-    try {
-      const allChronic = [...chronicDiseases];
-      if (customChronic.trim()) allChronic.push(customChronic.trim());
+const handleFinishTriage = async () => {
+  setIsLoading(true);
+  try {
+    const allChronic = [...chronicDiseases];
+    if (customChronic.trim()) allChronic.push(customChronic.trim());
 
-      const allLocalization = [...selectedParts];
-      if (customLocalization.trim())
-        allLocalization.push(customLocalization.trim());
+    const allLocalization = [...selectedParts];
+    if (customLocalization.trim())
+      allLocalization.push(customLocalization.trim());
 
-      const triageResponse = await submitTriage({
-        category: category || "Общая жалоба",
-        complaint_text: complaintText,
-        localization: allLocalization.join(", "),
-        chronic_diseases: allChronic,
-        medications,
-        allergies,
-        surgeries_last_year: surgeriesLastYear,
-        family_history: familyHistory,
-        is_pregnant: isPregnant,
-        is_child: isChild,
-        smoking,
-        payment_preference: paymentPref,
-      });
+    const triageResponse = await submitTriage({
+      category: category || "Общая жалоба",
+      complaint_text: complaintText,
+      localization: allLocalization.join(", "),
+      chronic_diseases: allChronic,
+      medications,
+      allergies,
+      surgeries_last_year: surgeriesLastYear,
+      family_history: familyHistory,
+      is_pregnant: isPregnant,
+      is_child: isChild,
+      smoking,
+      payment_preference: paymentPref,
+    });
 
-      setResult(triageResponse);
+    setResult(triageResponse);
 
-      const newHistoryItem: HistoryItem = {
-        id: Date.now().toString(),
-        date: "только что",
-        specialist: triageResponse.specialist.toLowerCase(),
-        urgency: triageResponse.urgency,
-        symptomsSummary:
-          [category, ...allLocalization, complaintText]
-            .filter(Boolean)
-            .join(", ") || "общее недомогание",
-      };
-      const updatedHistory = [newHistoryItem, ...history];
-      setHistory(updatedHistory);
-      localStorage.setItem("medved_history", JSON.stringify(updatedHistory));
+    const newHistoryItem: HistoryItem = {
+      id: Date.now().toString(),
+      date: new Date().toLocaleString("ru-RU", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      specialist: triageResponse.specialist.toLowerCase(),
+      urgency: triageResponse.urgency,
+      symptomsSummary:
+        [category, ...allLocalization, complaintText]
+          .filter(Boolean)
+          .join(", ") || "общее недомогание",
+    };
+const updatedHistory = [newHistoryItem, ...history];
+setHistory(updatedHistory);
+localStorage.setItem("medved_history_v2", JSON.stringify(updatedHistory));;
 
-      setScreen("final");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    setScreen("final");
+  } catch (error) {
+    alert("Не удалось получить рекомендацию. Сервис временно недоступен.");
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const handlePaymentChange = (newPref: PaymentType) => {
     setPaymentPref(newPref);
-    if (result) {
-      let newPlace = result.place;
-      if (newPref === "Платно") newPlace = "Частная клиника";
-      else if (newPref === "ДМС") newPlace = "Клиника по ДМС";
-      else if (newPref === "ОМС") newPlace = isChild ? "Детская поликлиника" : "Поликлиника";
-      
-      setResult({ ...result, place: newPlace });
-    }
   };
 
   const handleReset = () => {
