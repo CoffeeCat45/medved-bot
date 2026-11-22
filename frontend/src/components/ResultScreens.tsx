@@ -1,4 +1,5 @@
 import React from "react";
+import { Icon } from "./Icons";
 import type {
   TriageResult,
   HistoryItem,
@@ -40,12 +41,12 @@ export const FinalScreen: React.FC<FinalProps> = ({
     <h2 className="screen-title">Рекомендация</h2>
 
     <div className="result-row">
-      <span className="result-label">👤 Специалист:</span>
+      <span className="result-label"><Icon name="user" size={22} /> Специалист:</span>
       <span className="result-value">{result.specialist}</span>
     </div>
 
     <div className="result-row">
-      <span className="result-label">🏥 Куда обратиться:</span>
+      <span className="result-label"><Icon name="hospital" size={22} /> Куда обратиться:</span>
       <span className="result-value">{result.place}</span>
     </div>
 
@@ -82,7 +83,7 @@ export const FinalScreen: React.FC<FinalProps> = ({
     </button>
 
     <div className="disclaimer-banner mt-12">
-      <span>⚠️</span>
+      <Icon name="warning" size={20} />
       <span>При ухудшении самочувствия вызывайте скорую (103/112)</span>
     </div>
 
@@ -126,7 +127,7 @@ export const HistoryScreen: React.FC<HistoryProps> = ({ history, onBack }) => (
     </div>
 
     <button type="button" className="btn-back mt-16" onClick={onBack}>
-      ← Назад
+      <Icon name="arrow-left" size={16} /> Назад
     </button>
   </div>
 );
@@ -142,7 +143,7 @@ export const EmergencyScreen: React.FC<EmergencyProps> = ({
 }) => (
   <div className="screen-content emergency-screen">
     <div className="emergency-card">
-      <div className="emergency-icon">!</div>
+      <div className="emergency-icon"><Icon name="warning" size={26} /></div>
       <h2 className="emergency-title">
         Внимание!
         <br />
@@ -169,7 +170,7 @@ export const EmergencyScreen: React.FC<EmergencyProps> = ({
     </div>
 
     <button type="button" className="btn-back mt-16" onClick={onContinue}>
-      ← Продолжить опрос
+      <Icon name="arrow-left" size={16} /> Продолжить опрос
     </button>
   </div>
 );

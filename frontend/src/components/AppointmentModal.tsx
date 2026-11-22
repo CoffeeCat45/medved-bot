@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import type { PaymentType } from "../types";
+import { Icon } from "./Icons";
 
 interface AppointmentModalProps {
   specialist: string;
@@ -36,7 +37,7 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-card" onClick={(e) => e.stopPropagation()}>
         <button className="modal-close" onClick={onClose}>
-          ✕
+          <Icon name="close" size={18} />
         </button>
         <h2 className="modal-title">Запись на прием</h2>
 

@@ -12,6 +12,7 @@ import {
   submitTriage,
 } from "./api/mockBackend";
 import { BearMascot } from "./components/BearMascot";
+import { Icon } from "./components/Icons";
 import { AnamnesisStep } from "./components/AnamnesisStep";
 import { AppointmentModal } from "./components/AppointmentModal";
 import { Step1Symptoms, Step2Localization } from "./components/TriageSteps";
@@ -252,7 +253,7 @@ localStorage.setItem("medved_history_v2", JSON.stringify(updatedHistory));;
             onClick={() => setTheme(theme === "light" ? "dark" : "light")}
             title="Переключить тему"
           >
-            {theme === "light" ? "🌙" : "☀️"}
+            <Icon name={theme === "light" ? "moon" : "sun"} size={23} />
           </button>
         </header>
 
@@ -284,7 +285,7 @@ localStorage.setItem("medved_history_v2", JSON.stringify(updatedHistory));;
         {screen === "start" && (
           <div className="screen-content start-screen">
             <div className="disclaimer-banner">
-              <span>⚠️</span>
+              <Icon name="warning" size={20} />
               <span>
                 Я не ставлю диагноз и не заменяю врача. При ухудшении состояния
                 вызывайте скорую помощь!
@@ -292,7 +293,7 @@ localStorage.setItem("medved_history_v2", JSON.stringify(updatedHistory));;
             </div>
 
             <div className="start-card">
-              <div className="logo-circle">logo</div>
+              <div className="logo-circle"><Icon name="stethoscope" size={34} /></div>
               <h1 className="start-title">Медведь онлайн</h1>
               <p className="start-subtitle">
                 Ваш цифровой помощник по вопросам здоровья

@@ -1,4 +1,5 @@
 import React from "react";
+import { Icon } from "./Icons";
 
 interface AnamnesisStepProps {
   chronicDiseases: string[];
@@ -197,7 +198,7 @@ export const AnamnesisStep: React.FC<AnamnesisStepProps> = (props) => {
       </button>
 
       <button type="button" className="btn-back" onClick={props.onBack}>
-        ← Назад
+        <Icon name="arrow-left" size={16} /> Назад
       </button>
     </div>
   );

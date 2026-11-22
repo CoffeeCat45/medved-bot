@@ -1,63 +1,19 @@
 import React from "react";
 import { BodySelector } from "./BodySelector";
 
-// SVG-иконка лёгких
-const LungsIcon: React.FC = () => (
-  <svg
-    width="36"
-    height="36"
-    viewBox="0 0 48 48"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    aria-label="Лёгкие"
-    role="img"
-  >
-    <path
-      d="M23 5V22M25 5V22"
-      stroke="#171717"
-      strokeWidth="2.8"
-      strokeLinecap="round"
-    />
-    <path
-      d="M23 14L17 21M25 14L31 21"
-      stroke="#171717"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-    />
-    <path
-      d="M17 19C13 16 10 21 8 27C5 34 6 40 11 42C16 44 21 40 22 35L23 23C21 21 19 20 17 19Z"
-      fill="#F3A6AD"
-      stroke="#171717"
-      strokeWidth="2.2"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M31 19C35 16 38 21 40 27C43 34 42 40 37 42C32 44 27 40 26 35L25 23C27 21 29 20 31 19Z"
-      fill="#F3A6AD"
-      stroke="#171717"
-      strokeWidth="2.2"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M13 27C12 31 12 34 15 36M35 27C36 31 36 34 33 36"
-      stroke="#E98796"
-      strokeWidth="2"
-      strokeLinecap="round"
-    />
-  </svg>
-);
+import { Icon } from "./Icons";
 
 const CATEGORIES = [
-  { id: "Температура", label: "Температура", icon: "🌡️" },
+  { id: "Температура", label: "Температура", icon: "thermometer" },
   { id: "Дыхание", label: "Дыхание", icon: "lungs" },
-  { id: "Живот / ЖКТ", label: "Живот / ЖКТ", icon: "🤢" },
-  { id: "Кожа", label: "Кожа", icon: "🩹" },
+  { id: "Живот / ЖКТ", label: "Живот / ЖКТ", icon: "stomach" },
+  { id: "Кожа", label: "Кожа", icon: "band" },
   {
     id: "Неврология",
     label: "Неврология\n(голова, головокружение)",
-    icon: "🧠",
+    icon: "brain",
   },
-  { id: "Травма", label: "Травма", icon: "🦴" },
+  { id: "Травма", label: "Травма", icon: "bone" },
 ];
 
 interface Step1Props {
@@ -95,7 +51,18 @@ export const Step1Symptoms: React.FC<Step1Props> = ({
           onClick={() => setCategory(category === cat.id ? "" : cat.id)}
         >
           <span className="category-icon">
-            {cat.icon === "lungs" ? <LungsIcon /> : cat.icon}
+            <Icon
+              name={
+                cat.icon as
+                  | "thermometer"
+                  | "lungs"
+                  | "stomach"
+                  | "band"
+                  | "brain"
+                  | "bone"
+              }
+              size={40}
+            />
           </span>
 
           <span className="category-label">{cat.label}</span>
@@ -120,7 +87,7 @@ export const Step1Symptoms: React.FC<Step1Props> = ({
         onClick={() => onVoiceInput(setComplaintText)}
         title="Голосовой ввод"
       >
-        🎙️
+        <Icon name="microphone" size={23} />
       </button>
     </div>
 
@@ -186,7 +153,7 @@ export const Step2Localization: React.FC<Step2Props> = ({
         onClick={() => onVoiceInput(setCustomLocalization)}
         title="Голосовой ввод"
       >
-        🎙️
+        <Icon name="microphone" size={23} />
       </button>
     </div>
 
@@ -200,7 +167,7 @@ export const Step2Localization: React.FC<Step2Props> = ({
     </button>
 
     <button type="button" className="btn-back" onClick={onBack}>
-      ← Назад
+      <Icon name="arrow-left" size={16} /> Назад
     </button>
   </div>
 );
