@@ -74,16 +74,17 @@ export const FinalScreen: React.FC<FinalProps> = ({
       </select>
     </div>
 
-    <button type="button" className="btn-primary" onClick={onOpenModal}>
-      Записаться на прием
-    </button>
+    <div className="result-actions">
+      <button type="button" className="btn-primary" onClick={onOpenModal}>
+        Записаться на прием
+      </button>
+      <button type="button" className="btn-secondary-text" onClick={onReset}>
+        Начать сначала
+      </button>
+    </div>
 
-    <button type="button" className="btn-secondary-text" onClick={onReset}>
-      Начать сначала
-    </button>
-
-    <div className="disclaimer-banner mt-12">
-      <Icon name="warning" size={20} />
+    <div className="disclaimer-banner result-warning">
+      <Icon name="warning" size={18} />
       <span>При ухудшении самочувствия вызывайте скорую (103/112)</span>
     </div>
 

@@ -26,7 +26,7 @@ interface AnamnesisStepProps {
 }
 
 const CHRONIC_LIST = ["Сахарный диабет", "Гипертония", "Астма"];
-const FAMILY_LIST = ["ССЗ", "Онкология", "Диабет"];
+const FAMILY_LIST = ["ССЗ", "Онкология"];
 
 export const AnamnesisStep: React.FC<AnamnesisStepProps> = (props) => {
   return (
@@ -74,7 +74,7 @@ export const AnamnesisStep: React.FC<AnamnesisStepProps> = (props) => {
         <input
           type="text"
           className="text-input"
-          placeholder="Принимаемые лекарства (или напишите «нет»)"
+          placeholder="Принимаемые лекарства"
           value={props.medications}
           onChange={(e) => props.onChangeMedications(e.target.value)}
         />

@@ -240,7 +240,7 @@ localStorage.setItem("medved_history_v2", JSON.stringify(updatedHistory));;
               onClick={handleReset}
               title="На главную"
             >
-              <span className="brand-dot" />
+              <BearMascot size={30} />
               <span>Медведь онлайн</span>
             </div>
           ) : (

@@ -4,16 +4,17 @@ import { BodySelector } from "./BodySelector";
 import { Icon } from "./Icons";
 
 const CATEGORIES = [
-  { id: "Температура", label: "Температура", icon: "thermometer" },
-  { id: "Дыхание", label: "Дыхание", icon: "lungs" },
-  { id: "Живот / ЖКТ", label: "Живот / ЖКТ", icon: "stomach" },
-  { id: "Кожа", label: "Кожа", icon: "band" },
+  { id: "Температура", label: "Температура", description: "", icon: "thermometer" },
+  { id: "Дыхание", label: "Дыхание", description: "", icon: "lungs" },
+  { id: "Живот / ЖКТ", label: "Живот / ЖКТ", description: "", icon: "stomach" },
+  { id: "Кожа", label: "Кожа", description: "", icon: "band" },
   {
     id: "Неврология",
-    label: "Неврология\n(голова, головокружение)",
+    label: "Неврология",
+    description: "(голова, головокружение)",
     icon: "brain",
   },
-  { id: "Травма", label: "Травма", icon: "bone" },
+  { id: "Травма", label: "Травма", description: "", icon: "bone" },
 ];
 
 interface Step1Props {
@@ -65,7 +66,7 @@ export const Step1Symptoms: React.FC<Step1Props> = ({
             />
           </span>
 
-          <span className="category-label">{cat.label}</span>
+          <span className="category-label">{cat.label}{cat.description && <small>{cat.description}</small>}</span>
         </button>
       ))}
     </div>
