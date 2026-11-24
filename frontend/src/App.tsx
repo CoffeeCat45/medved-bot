@@ -102,28 +102,43 @@ export function App() {
   };
 
   const handleVoiceInput = (
-    setter: React.Dispatch<React.SetStateAction<string>>,
-  ) => {
-    const SpeechRecognition =
-      (window as unknown as Record<string, unknown>).SpeechRecognition ||
-      (window as unknown as Record<string, unknown>).webkitSpeechRecognition;
+  setter: React.Dispatch<React.SetStateAction<string>>,
+) => {
+  const SpeechRecognition =
+    (window as unknown as Record<string, unknown>).SpeechRecognition ||
+    (window as unknown as Record<string, unknown>).webkitSpeechRecognition;
 
-    if (!SpeechRecognition) {
-      alert("Голосовой ввод поддерживается в Chrome / Яндекс Браузере.");
-      return;
-    }
+  if (!SpeechRecognition) {
+    alert("Голосовой ввод поддерживается в Chrome / Яндекс Браузере.");
+    return;
+  }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const recognition = new (SpeechRecognition as any)();
-    recognition.lang = "ru-RU";
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    recognition.onresult = (event: any) => {
-      const transcript = event.results.transcript;
-      setter((prev) => (prev ? `${prev} ${transcript}` : transcript));
-    };
-    recognition.start();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognition = new (SpeechRecognition as any)();
+  recognition.lang = "ru-RU";
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  recognition.onresult = (event: any) => {
+    const transcript: string = event.results[0][0].transcript;
+    if (!transcript) return;
+    setter((prev) => (prev ? `${prev} ${transcript}` : transcript));
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  recognition.onerror = (event: any) => {
+    if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+      alert("Нет доступа к микрофону. Разрешите доступ в настройках браузера.");
+    } else if (event.error === "no-speech") {
+      alert("Речь не распознана. Попробуйте ещё раз.");
+    } else {
+      alert(`Ошибка голосового ввода: ${event.error}`);
+    }
+  };
+
+  recognition.start();
+};
   const handleCheckAndNext = async (
     textToCheck: string,
     nextStep: ScreenStep,
