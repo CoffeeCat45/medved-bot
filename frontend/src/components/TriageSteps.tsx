@@ -4,17 +4,16 @@ import { BodySelector } from "./BodySelector";
 import { Icon } from "./Icons";
 
 const CATEGORIES = [
-  { id: "Температура", label: "Температура", description: "", icon: "thermometer" },
-  { id: "Дыхание", label: "Дыхание", description: "", icon: "lungs" },
-  { id: "Живот / ЖКТ", label: "Живот / ЖКТ", description: "", icon: "stomach" },
-  { id: "Кожа", label: "Кожа", description: "", icon: "band" },
+  { id: "Температура", label: "Температура", icon: "thermometer" },
+  { id: "Дыхание", label: "Дыхание", icon: "lungs" },
+  { id: "Живот / ЖКТ", label: "Живот / ЖКТ", icon: "stomach" },
+  { id: "Кожа", label: "Кожа", icon: "band" },
   {
     id: "Неврология",
-    label: "Неврология",
-    description: "(голова, головокружение)",
+    label: "Неврология\n(голова, головокружение)",
     icon: "brain",
   },
-  { id: "Травма", label: "Травма", description: "", icon: "bone" },
+  { id: "Травма", label: "Травма", icon: "bone" },
 ];
 
 interface Step1Props {
@@ -44,31 +43,38 @@ export const Step1Symptoms: React.FC<Step1Props> = ({
     </p>
 
     <div className="categories-grid">
-      {CATEGORIES.map((cat) => (
-        <button
-          key={cat.id}
-          type="button"
-          className={`category-card ${category === cat.id ? "selected" : ""}`}
-          onClick={() => setCategory(category === cat.id ? "" : cat.id)}
-        >
-          <span className="category-icon">
-            <Icon
-              name={
-                cat.icon as
-                  | "thermometer"
-                  | "lungs"
-                  | "stomach"
-                  | "band"
-                  | "brain"
-                  | "bone"
-              }
-              size={40}
-            />
-          </span>
+      {CATEGORIES.map((cat) => {
+        const [mainLabel, noteLabel] = cat.label.split("\n");
 
-          <span className="category-label">{cat.label}{cat.description && <small>{cat.description}</small>}</span>
-        </button>
-      ))}
+        return (
+          <button
+            key={cat.id}
+            type="button"
+            className={`category-card ${category === cat.id ? "selected" : ""}`}
+            onClick={() => setCategory(category === cat.id ? "" : cat.id)}
+          >
+            <span className="category-icon">
+              <Icon
+                name={
+                  cat.icon as
+                    | "thermometer"
+                    | "lungs"
+                    | "stomach"
+                    | "band"
+                    | "brain"
+                    | "bone"
+                }
+                size={40}
+              />
+            </span>
+
+            <span className="category-label">
+              <span className="category-main">{mainLabel}</span>
+              {noteLabel && <span className="category-note">{noteLabel}</span>}
+            </span>
+          </button>
+        );
+      })}
     </div>
 
     <div className="divider-text">или</div>
