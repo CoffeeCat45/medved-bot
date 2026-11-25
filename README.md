@@ -16,7 +16,7 @@
 
 | Слой | Технологии |
 |---|---|
-| Frontend | React 18, TypeScript, Vite, @maxhub/max-ui |
+| Frontend | React 18, TypeScript, Vite |
 | Backend | Python 3.11, FastAPI, Pydantic v2 |
 | LLM | GigaChat API (Сбер) |
 | Деплой | GitHub Pages (frontend), Amvera Docker (backend) |
