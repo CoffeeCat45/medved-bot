@@ -39,28 +39,27 @@ export const FinalScreen: React.FC<FinalProps> = ({
 }) => (
   <div className="screen-content card-screen">
     <h2 className="screen-title">Рекомендация</h2>
-
     <div className="result-row">
-      <span className="result-label"><Icon name="user" size={22} /> Специалист:</span>
+      <span className="result-label">
+        <Icon name="user" size={22} /> Специалист:
+      </span>
       <span className="result-value">{result.specialist}</span>
     </div>
-
     <div className="result-row">
-      <span className="result-label"><Icon name="hospital" size={22} /> Куда обратиться:</span>
+      <span className="result-label">
+        <Icon name="hospital" size={22} /> Куда обратиться:
+      </span>
       <span className="result-value">{result.place}</span>
     </div>
-
     <div className="urgency-wrapper">
       <span className={`urgency-badge ${getUrgencyClass(result.urgency)}`}>
         {result.urgency}
       </span>
     </div>
-
     <div className="reasoning-block">
       <div className="reasoning-title">Почему мы так решили</div>
       <p className="reasoning-text">{result.reasoning.join(" ")}</p>
     </div>
-
     <div className="payment-inline">
       <span>Форма обращения:</span>
       <select
@@ -73,7 +72,6 @@ export const FinalScreen: React.FC<FinalProps> = ({
         <option value="Платно">Платно</option>
       </select>
     </div>
-
     <div className="result-actions">
       <button type="button" className="btn-primary" onClick={onOpenModal}>
         Записаться на прием
@@ -82,12 +80,10 @@ export const FinalScreen: React.FC<FinalProps> = ({
         Начать сначала
       </button>
     </div>
-
     <div className="disclaimer-banner result-warning">
       <Icon name="warning" size={18} />
       <span>При ухудшении самочувствия вызывайте скорую (103/112)</span>
     </div>
-
     <button type="button" className="btn-history-link" onClick={onOpenHistory}>
       История обращений
     </button>
@@ -97,36 +93,52 @@ export const FinalScreen: React.FC<FinalProps> = ({
 interface HistoryProps {
   history: HistoryItem[];
   onBack: () => void;
+  onClear: () => void;
 }
 
-export const HistoryScreen: React.FC<HistoryProps> = ({ history, onBack }) => (
+export const HistoryScreen: React.FC<HistoryProps> = ({
+  history,
+  onBack,
+  onClear,
+}) => (
   <div className="screen-content card-screen">
     <h2 className="screen-title">История обращений</h2>
     <p className="screen-subtitle">
       Все ваши обращения к боту «Медведь онлайн»
     </p>
-
-    <div className="history-list">
-      {history.map((item) => (
-        <div key={item.id} className="history-card">
-          <div className="history-card-top">
-            <span className="history-date">{item.date}</span>
-            <span
-              className={`urgency-badge small ${getUrgencyClass(item.urgency)}`}
-            >
-              {item.urgency}
-            </span>
+    {history.length === 0 ? (
+      <div className="history-card" style={{ textAlign: "center" }}>
+        <p className="history-symptoms">История пуста</p>
+      </div>
+    ) : (
+      <div className="history-list">
+        {history.map((item) => (
+          <div key={item.id} className="history-card">
+            <div className="history-card-top">
+              <span className="history-date">{item.date}</span>
+              <span
+                className={`urgency-badge small ${getUrgencyClass(
+                  item.urgency,
+                )}`}
+              >
+                {item.urgency}
+              </span>
+            </div>
+            <div className="history-rec">
+              Рекомендация: обратиться к {item.specialist}
+            </div>
+            <div className="history-symptoms">
+              Вы отметили: {item.symptomsSummary}
+            </div>
           </div>
-          <div className="history-rec">
-            Рекомендация: обратиться к {item.specialist}
-          </div>
-          <div className="history-symptoms">
-            Вы отметили: {item.symptomsSummary}
-          </div>
-        </div>
-      ))}
-    </div>
-
+        ))}
+      </div>
+    )}
+    {history.length > 0 && (
+      <button type="button" className="btn-danger-text mt-12" onClick={onClear}>
+        Очистить историю
+      </button>
+    )}
     <button type="button" className="btn-back mt-16" onClick={onBack}>
       <Icon name="arrow-left" size={16} /> Назад
     </button>
@@ -144,7 +156,9 @@ export const EmergencyScreen: React.FC<EmergencyProps> = ({
 }) => (
   <div className="screen-content emergency-screen">
     <div className="emergency-card">
-      <div className="emergency-icon"><Icon name="warning" size={26} /></div>
+      <div className="emergency-icon">
+        <Icon name="warning" size={26} />
+      </div>
       <h2 className="emergency-title">
         Внимание!
         <br />
@@ -159,19 +173,44 @@ export const EmergencyScreen: React.FC<EmergencyProps> = ({
         <br />
         <strong>103 или 112</strong>
       </p>
-
       <a href="tel:103" className="btn-emergency-primary">
         Вызвать скорую (103)
       </a>
       <a href="tel:112" className="btn-emergency-outline">
         Позвонить 112
       </a>
-
       <p className="emergency-note">Пожалуйста, не занимайтесь самолечением!</p>
     </div>
-
     <button type="button" className="btn-back mt-16" onClick={onContinue}>
-      <Icon name="arrow-left" size={16} /> Продолжить опрос
+      <Icon name="arrow-left" size={16} /> Назад
     </button>
+  </div>
+);
+
+interface ErrorScreenProps {
+  title?: string;
+  description?: string;
+  onBack: () => void;
+}
+
+export const ErrorScreen: React.FC<ErrorScreenProps> = ({
+  title = "Сервис временно недоступен",
+  description = "Не удалось связаться с сервером. Проверьте подключение к интернету и попробуйте ещё раз через несколько секунд.",
+  onBack,
+}) => (
+  <div className="screen-content error-screen">
+    <div className="error-card">
+      <div className="error-icon">
+        <Icon name="warning" size={26} />
+      </div>
+      <h2 className="error-title">{title}</h2>
+      <p className="error-desc">{description}</p>
+      <button type="button" className="btn-primary" onClick={onBack}>
+        Попробовать снова
+      </button>
+      <p className="error-note">
+        Если проблема повторяется — обратитесь в поддержку
+      </p>
+    </div>
   </div>
 );

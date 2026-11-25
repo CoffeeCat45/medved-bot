@@ -21,6 +21,7 @@ import {
   FinalScreen,
   HistoryScreen,
   EmergencyScreen,
+  ErrorScreen,
 } from "./components/ResultScreens";
 
 type ScreenStep =
@@ -30,23 +31,20 @@ type ScreenStep =
   | "step3"
   | "final"
   | "history"
-  | "emergency";
+  | "emergency"
+  | "error";
 
-  
 export function App() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [screen, setScreen] = useState<ScreenStep>("start");
   const [previousScreen, setPreviousScreen] = useState<ScreenStep>("step1");
   const [isLoading, setIsLoading] = useState(false);
-
   const [userFullName, setUserFullName] = useState("Иванов Иван Иванович");
   const [isChild, setIsChild] = useState(false);
-
   const [category, setCategory] = useState("");
   const [complaintText, setComplaintText] = useState("");
   const [selectedParts, setSelectedParts] = useState<string[]>([]);
   const [customLocalization, setCustomLocalization] = useState("");
-
   const [chronicDiseases, setChronicDiseases] = useState<string[]>([]);
   const [customChronic, setCustomChronic] = useState("");
   const [medications, setMedications] = useState("");
@@ -55,16 +53,17 @@ export function App() {
   const [familyHistory, setFamilyHistory] = useState<string[]>([]);
   const [isPregnant, setIsPregnant] = useState(false);
   const [smoking, setSmoking] = useState(false);
-
   const [result, setResult] = useState<TriageResult | null>(null);
   const [emergencyAlert, setEmergencyAlert] = useState<EmergencyAlert | null>(
     null,
   );
   const [paymentPref, setPaymentPref] = useState<PaymentType>("ОМС");
-  const [lastPayload, setLastPayload] = useState<PatientCasePayload | null>(null);
+  const [lastPayload, setLastPayload] = useState<PatientCasePayload | null>(
+    null,
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [history, setHistory] = useState<HistoryItem[]>(() => {
-  const saved = localStorage.getItem("medved_history_v2");
+    const saved = localStorage.getItem("medved_history_v2");
     if (!saved) return [];
     try {
       return JSON.parse(saved);
@@ -78,19 +77,25 @@ export function App() {
   }, [theme]);
 
   useEffect(() => {
-    fetchUserProfile().then((profile) => {
-      if (profile?.full_name) {
-        const { lastName, firstName, middleName } = profile.full_name;
-        setUserFullName(
-          [lastName, firstName, middleName].filter(Boolean).join(" "),
-        );
-      }
-      if (profile?.birthDate) {
-        const age =
-          new Date().getFullYear() - new Date(profile.birthDate).getFullYear();
-        if (age < 18) setIsChild(true);
-      }
-    });
+    fetchUserProfile()
+      .then((profile) => {
+        if (profile?.full_name) {
+          const { lastName, firstName, middleName } = profile.full_name;
+          const fullName = [lastName, firstName, middleName]
+            .filter(Boolean)
+            .join(" ");
+          if (fullName) setUserFullName(fullName);
+        }
+        if (profile?.birthDate) {
+          const age =
+            new Date().getFullYear() -
+            new Date(profile.birthDate).getFullYear();
+          if (age < 18) setIsChild(true);
+        }
+      })
+      .catch(() => {
+        // профиль не загрузился — оставляем дефолтное имя
+      });
   }, []);
 
   const toggleArrayItem = (
@@ -104,43 +109,44 @@ export function App() {
   };
 
   const handleVoiceInput = (
-  setter: React.Dispatch<React.SetStateAction<string>>,
-) => {
-  const SpeechRecognition =
-    (window as unknown as Record<string, unknown>).SpeechRecognition ||
-    (window as unknown as Record<string, unknown>).webkitSpeechRecognition;
-
-  if (!SpeechRecognition) {
-    alert("Голосовой ввод поддерживается в Chrome / Яндекс Браузере.");
-    return;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const recognition = new (SpeechRecognition as any)();
-  recognition.lang = "ru-RU";
-  recognition.interimResults = false;
-  recognition.maxAlternatives = 1;
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  recognition.onresult = (event: any) => {
-    const transcript: string = event.results[0][0].transcript;
-    if (!transcript) return;
-    setter((prev) => (prev ? `${prev} ${transcript}` : transcript));
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  recognition.onerror = (event: any) => {
-    if (event.error === "not-allowed" || event.error === "service-not-allowed") {
-      alert("Нет доступа к микрофону. Разрешите доступ в настройках браузера.");
-    } else if (event.error === "no-speech") {
-      alert("Речь не распознана. Попробуйте ещё раз.");
-    } else {
-      alert(`Ошибка голосового ввода: ${event.error}`);
+    setter: React.Dispatch<React.SetStateAction<string>>,
+  ) => {
+    const SpeechRecognition =
+      (window as unknown as Record<string, unknown>).SpeechRecognition ||
+      (window as unknown as Record<string, unknown>).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Голосовой ввод поддерживается в Chrome / Яндекс Браузере.");
+      return;
     }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const recognition = new (SpeechRecognition as any)();
+    recognition.lang = "ru-RU";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    recognition.onresult = (event: any) => {
+      const transcript: string = event.results[0][0].transcript;
+      if (!transcript) return;
+      setter((prev) => (prev ? `${prev} ${transcript}` : transcript));
+    };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    recognition.onerror = (event: any) => {
+      if (
+        event.error === "not-allowed" ||
+        event.error === "service-not-allowed"
+      ) {
+        alert(
+          "Нет доступа к микрофону. Разрешите доступ в настройках браузера.",
+        );
+      } else if (event.error === "no-speech") {
+        alert("Речь не распознана. Попробуйте ещё раз.");
+      } else {
+        alert(`Ошибка голосового ввода: ${event.error}`);
+      }
+    };
+    recognition.start();
   };
 
-  recognition.start();
-};
   const handleCheckAndNext = async (
     textToCheck: string,
     nextStep: ScreenStep,
@@ -155,82 +161,80 @@ export function App() {
         return;
       }
       setScreen(nextStep);
+    } catch {
+      setPreviousScreen(screen);
+      setScreen("error");
     } finally {
       setIsLoading(false);
     }
   };
 
-const handleFinishTriage = async () => {
-  setIsLoading(true);
-  try {
-    const allChronic = [...chronicDiseases];
-    if (customChronic.trim()) allChronic.push(customChronic.trim());
-
-    const allLocalization = [...selectedParts];
-    if (customLocalization.trim())
-      allLocalization.push(customLocalization.trim());
-
-    const payload: PatientCasePayload = {
-      category: category || "Общая жалоба",
-      complaint_text: complaintText,
-      localization: allLocalization.join(", "),
-      chronic_diseases: allChronic,
-      medications,
-      allergies,
-      surgeries_last_year: surgeriesLastYear,
-      family_history: familyHistory,
-      is_pregnant: isPregnant,
-      is_child: isChild,
-      smoking,
-      payment_preference: paymentPref,
-    };
-    setLastPayload(payload);
-
-    const triageResponse = await submitTriage(payload);
-
-    setResult(triageResponse);
-
-    const newHistoryItem: HistoryItem = {
-      id: Date.now().toString(),
-      date: new Date().toLocaleString("ru-RU", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      specialist: triageResponse.specialist.toLowerCase(),
-      urgency: triageResponse.urgency,
-      symptomsSummary:
-        [category, ...allLocalization, complaintText]
-          .filter(Boolean)
-          .join(", ") || "общее недомогание",
-};
-
-
-
-
-const updatedHistory = [newHistoryItem, ...history];
-setHistory(updatedHistory);
-localStorage.setItem("medved_history_v2", JSON.stringify(updatedHistory));;
-
-    setScreen("final");
-  } catch (error) {
-    alert("Не удалось получить рекомендацию. Сервис временно недоступен.");
-  } finally {
-    setIsLoading(false);
-  }
-};
+  const handleFinishTriage = async () => {
+    setIsLoading(true);
+    try {
+      const allChronic = [...chronicDiseases];
+      if (customChronic.trim()) allChronic.push(customChronic.trim());
+      const allLocalization = [...selectedParts];
+      if (customLocalization.trim())
+        allLocalization.push(customLocalization.trim());
+      const payload: PatientCasePayload = {
+        category: category || "Общая жалоба",
+        complaint_text: complaintText,
+        localization: allLocalization.join(", "),
+        chronic_diseases: allChronic,
+        medications,
+        allergies,
+        surgeries_last_year: surgeriesLastYear,
+        family_history: familyHistory,
+        is_pregnant: isPregnant,
+        is_child: isChild,
+        smoking,
+        payment_preference: paymentPref,
+      };
+      setLastPayload(payload);
+      const triageResponse = await submitTriage(payload);
+      setResult(triageResponse);
+      const newHistoryItem: HistoryItem = {
+        id: Date.now().toString(),
+        date: new Date().toLocaleString("ru-RU", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        specialist: triageResponse.specialist.toLowerCase(),
+        urgency: triageResponse.urgency,
+        symptomsSummary:
+          [category, ...allLocalization, complaintText]
+            .filter(Boolean)
+            .join(", ") || "общее недомогание",
+      };
+      const updatedHistory = [newHistoryItem, ...history];
+      setHistory(updatedHistory);
+      localStorage.setItem("medved_history_v2", JSON.stringify(updatedHistory));
+      setScreen("final");
+    } catch {
+      setPreviousScreen(screen);
+      setScreen("error");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handlePaymentChange = async (newPref: PaymentType) => {
     setPaymentPref(newPref);
     if (!result || !lastPayload) return;
     setIsLoading(true);
     try {
-      const updated = await submitTriage({ ...lastPayload, payment_preference: newPref });
+      const updated = await submitTriage({
+        ...lastPayload,
+        payment_preference: newPref,
+      });
       setResult(updated);
     } catch {
-      alert("Не удалось обновить рекомендацию. Проверьте соединение.");
+      setPreviousScreen(screen);
+      setScreen("error");
     } finally {
       setIsLoading(false);
     }
@@ -252,6 +256,11 @@ localStorage.setItem("medved_history_v2", JSON.stringify(updatedHistory));;
     setResult(null);
     setLastPayload(null);
     setScreen("start");
+  };
+
+  const handleClearHistory = () => {
+    setHistory([]);
+    localStorage.removeItem("medved_history_v2");
   };
 
   const currentStepNumber =
@@ -281,7 +290,6 @@ localStorage.setItem("medved_history_v2", JSON.stringify(updatedHistory));;
           ) : (
             <div />
           )}
-
           <button
             type="button"
             className="theme-toggle"
@@ -291,7 +299,6 @@ localStorage.setItem("medved_history_v2", JSON.stringify(updatedHistory));;
             <Icon name={theme === "light" ? "moon" : "sun"} size={23} />
           </button>
         </header>
-
         {currentStepNumber > 0 && (
           <div className="stepper">
             {[1, 2, 3, 4].map((step, idx) => (
@@ -309,14 +316,15 @@ localStorage.setItem("medved_history_v2", JSON.stringify(updatedHistory));;
                 </div>
                 {idx < 3 && (
                   <div
-                    className={`step-line ${step < currentStepNumber ? "completed" : ""}`}
+                    className={`step-line ${
+                      step < currentStepNumber ? "completed" : ""
+                    }`}
                   />
                 )}
               </div>
             ))}
           </div>
         )}
-
         {screen === "start" && (
           <div className="screen-content start-screen">
             <div className="disclaimer-banner">
@@ -326,14 +334,19 @@ localStorage.setItem("medved_history_v2", JSON.stringify(updatedHistory));;
                 вызывайте скорую помощь!
               </span>
             </div>
-
             <div className="start-card">
-              <div className="logo-circle"><Icon name="stethoscope" size={34} /></div>
+              <div className="logo-circle">
+                <Icon name="stethoscope" size={34} />
+              </div>
               <h1 className="start-title">Медведь онлайн</h1>
               <p className="start-subtitle">
                 Ваш цифровой помощник по вопросам здоровья
               </p>
-
+              {userFullName && (
+                <p className="user-greeting">
+                  Здравствуйте, <strong>{userFullName}</strong>
+                </p>
+              )}
               <label className="child-checkbox">
                 <input
                   type="checkbox"
@@ -342,7 +355,6 @@ localStorage.setItem("medved_history_v2", JSON.stringify(updatedHistory));;
                 />
                 <span>Заполняю для ребенка (до 18 лет)</span>
               </label>
-
               <button
                 type="button"
                 className="btn-primary"
@@ -350,7 +362,6 @@ localStorage.setItem("medved_history_v2", JSON.stringify(updatedHistory));;
               >
                 Начать
               </button>
-
               <p className="legal-hint">
                 Нажимая кнопку, вы соглашаетесь с обработкой персональных данных
                 (ФЗ-152)
@@ -358,7 +369,6 @@ localStorage.setItem("medved_history_v2", JSON.stringify(updatedHistory));;
             </div>
           </div>
         )}
-
         {screen === "step1" && (
           <Step1Symptoms
             category={category}
@@ -370,7 +380,6 @@ localStorage.setItem("medved_history_v2", JSON.stringify(updatedHistory));;
             onNext={() => handleCheckAndNext(complaintText, "step2")}
           />
         )}
-
         {screen === "step2" && (
           <Step2Localization
             selectedParts={selectedParts}
@@ -385,7 +394,6 @@ localStorage.setItem("medved_history_v2", JSON.stringify(updatedHistory));;
             onBack={() => setScreen("step1")}
           />
         )}
-
         {screen === "step3" && (
           <AnamnesisStep
             chronicDiseases={chronicDiseases}
@@ -415,7 +423,6 @@ localStorage.setItem("medved_history_v2", JSON.stringify(updatedHistory));;
             onBack={() => setScreen("step2")}
           />
         )}
-
         {screen === "final" && result && (
           <FinalScreen
             result={result}
@@ -426,26 +433,26 @@ localStorage.setItem("medved_history_v2", JSON.stringify(updatedHistory));;
             onOpenHistory={() => setScreen("history")}
           />
         )}
-
         {screen === "history" && (
           <HistoryScreen
             history={history}
             onBack={() => setScreen(result ? "final" : "start")}
+            onClear={handleClearHistory}
           />
         )}
-
         {screen === "emergency" && (
           <EmergencyScreen
             alert={emergencyAlert}
             onContinue={() => setScreen(previousScreen)}
           />
         )}
-
+        {screen === "error" && (
+          <ErrorScreen onBack={() => setScreen(previousScreen)} />
+        )}
         <div className="mascot-footer">
           <BearMascot />
         </div>
       </div>
-
       {isModalOpen && result && (
         <AppointmentModal
           specialist={result.specialist}
@@ -456,7 +463,6 @@ localStorage.setItem("medved_history_v2", JSON.stringify(updatedHistory));;
       )}
     </div>
   );
-  
 }
 
 export default App;

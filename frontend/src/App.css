@@ -1,7 +1,6 @@
 /* Медведь онлайн — оформление Mini App */
 
 .app-shell {
-
   --bg: #f3f6fa;
 
   --surface: #ffffff;
@@ -47,17 +46,11 @@
   background: var(--bg);
 
   transition:
-
     background-color 0.22s ease,
-
     color 0.22s ease;
-
 }
 
-
-
 .app-shell[data-theme="dark"] {
-
   color-scheme: dark;
 
   --bg: #10141b;
@@ -89,13 +82,9 @@
   --warning-text: #ffd18a;
 
   --silhouette-fill: #f5f7fb;
-
 }
 
-
-
 .mobile-frame {
-
   width: 100%;
 
   max-width: 440px;
@@ -105,7 +94,6 @@
   min-height: 100dvh;
 
   padding: max(16px, env(safe-area-inset-top)) 18px
-
     max(22px, env(safe-area-inset-bottom));
 
   display: flex;
@@ -117,13 +105,9 @@
   background: var(--bg);
 
   transition: background-color 0.22s ease;
-
 }
 
-
-
 .top-bar {
-
   min-height: 38px;
 
   display: flex;
@@ -133,11 +117,9 @@
   justify-content: space-between;
 
   margin-bottom: 13px;
-
 }
 
 .brand-mini {
-
   display: inline-flex;
 
   align-items: center;
@@ -151,11 +133,9 @@
   font-weight: 700;
 
   cursor: pointer;
-
 }
 
 .brand-dot {
-
   width: 9px;
 
   height: 9px;
@@ -165,11 +145,9 @@
   background: var(--blue);
 
   box-shadow: 0 0 0 4px var(--blue-soft);
-
 }
 
 .theme-toggle {
-
   width: 36px;
 
   height: 36px;
@@ -195,23 +173,15 @@
   box-shadow: 0 2px 8px rgba(20, 40, 70, 0.05);
 
   transition:
-
     transform 0.18s,
-
     background 0.18s;
-
 }
 
 .theme-toggle:active {
-
   transform: scale(0.93);
-
 }
 
-
-
 .stepper {
-
   /* Шаги занимают ширину по содержимому и центрируются в карточке */
 
   width: max-content;
@@ -225,11 +195,9 @@
   justify-content: center;
 
   margin: 2px auto 22px;
-
 }
 
 .stepper-item {
-
   flex: 0 1 auto;
 
   min-width: 0;
@@ -237,11 +205,9 @@
   display: flex;
 
   align-items: center;
-
 }
 
 .step-circle {
-
   flex: 0 0 25px;
 
   width: 25px;
@@ -263,23 +229,18 @@
   font-size: 11px;
 
   font-weight: 700;
-
 }
 
 .step-circle.active,
-
 .step-circle.completed {
-
   border-color: var(--blue);
 
   background: var(--blue);
 
   color: #fff;
-
 }
 
 .step-line {
-
   height: 2px;
 
   width: clamp(28px, 7vw, 80px);
@@ -293,19 +254,13 @@
   border-radius: 2px;
 
   background: var(--border);
-
 }
 
 .step-line.completed {
-
   background: var(--blue);
-
 }
 
-
-
 .screen-content {
-
   width: 100%;
 
   display: flex;
@@ -315,19 +270,14 @@
   flex-direction: column;
 
   gap: 13px;
-
 }
 
 .card-screen {
-
   gap: 13px;
-
 }
 
 .screen-title,
-
 .title {
-
   margin: 0;
 
   color: var(--text);
@@ -341,13 +291,10 @@
   font-weight: 750;
 
   letter-spacing: -0.3px;
-
 }
 
 .screen-subtitle,
-
 .subtitle {
-
   margin: -4px 0 3px;
 
   color: var(--muted);
@@ -357,11 +304,9 @@
   font-size: 12px;
 
   line-height: 1.5;
-
 }
 
 .disclaimer-banner {
-
   width: 100%;
 
   display: flex;
@@ -387,39 +332,27 @@
   font-size: 11px;
 
   line-height: 1.45;
-
 }
 
 .mt-8 {
-
   margin-top: 8px;
-
 }
 
 .mt-12 {
-
   margin-top: 12px;
-
 }
 
 .mt-16 {
-
   margin-top: 5px;
-
 }
 
-
-
 .start-screen {
-
   justify-content: flex-start;
 
   padding-top: 4px;
-
 }
 
 .start-card {
-
   width: 100%;
 
   margin-top: 18px;
@@ -443,11 +376,9 @@
   box-shadow: var(--shadow);
 
   text-align: center;
-
 }
 
 .logo-circle {
-
   width: 62px;
 
   height: 62px;
@@ -463,11 +394,9 @@
   color: var(--muted);
 
   font-size: 12px;
-
 }
 
 .start-title {
-
   margin: 0;
 
   color: var(--text);
@@ -477,11 +406,9 @@
   line-height: 1.2;
 
   font-weight: 800;
-
 }
 
 .start-subtitle {
-
   margin: 0;
 
   color: var(--muted);
@@ -489,11 +416,9 @@
   font-size: 13px;
 
   line-height: 1.5;
-
 }
 
 .child-checkbox {
-
   display: flex;
 
   align-items: center;
@@ -507,21 +432,17 @@
   font-size: 12px;
 
   cursor: pointer;
-
 }
 
 .child-checkbox input {
-
   width: 16px;
 
   height: 16px;
 
   accent-color: var(--blue);
-
 }
 
 .legal-hint {
-
   margin: 0;
 
   color: var(--muted);
@@ -529,17 +450,11 @@
   font-size: 10px;
 
   line-height: 1.45;
-
 }
 
-
-
 .card,
-
 .section-block,
-
 .history-card {
-
   width: 100%;
 
   padding: 14px;
@@ -551,21 +466,17 @@
   background: var(--surface);
 
   box-shadow: var(--shadow);
-
 }
 
 .categories-grid {
-
   display: grid;
 
   grid-template-columns: repeat(2, minmax(0, 1fr));
 
   gap: 9px;
-
 }
 
 .category-card {
-
   min-width: 0;
 
   min-height: 82px;
@@ -601,33 +512,23 @@
   box-shadow: 0 2px 7px rgba(20, 40, 70, 0.025);
 
   transition:
-
     border-color 0.18s,
-
     background 0.18s,
-
     transform 0.18s,
-
     box-shadow 0.18s;
-
 }
 
 .category-card:hover {
-
   border-color: #a9cafa;
 
   box-shadow: 0 4px 12px rgba(57, 136, 245, 0.08);
-
 }
 
 .category-card:active {
-
   transform: scale(0.98);
-
 }
 
 .category-card.selected {
-
   border-color: var(--blue);
 
   background: var(--blue-soft);
@@ -635,11 +536,9 @@
   color: var(--blue);
 
   box-shadow: 0 0 0 2px rgba(57, 136, 245, 0.08);
-
 }
 
 .category-icon {
-
   display: grid;
 
   place-items: center;
@@ -649,11 +548,9 @@
   height: 40px;
 
   color: var(--text);
-
 }
 
 .category-label {
-
   font-size: 12px;
 
   line-height: 1.35;
@@ -661,11 +558,9 @@
   font-weight: 650;
 
   white-space: pre-line;
-
 }
 
 .divider-text {
-
   display: flex;
 
   align-items: center;
@@ -677,13 +572,10 @@
   font-size: 11px;
 
   text-align: center;
-
 }
 
 .divider-text::before,
-
 .divider-text::after {
-
   content: "";
 
   height: 1px;
@@ -691,13 +583,9 @@
   flex: 1;
 
   background: var(--border);
-
 }
 
-
-
 .input-with-mic {
-
   width: 100%;
 
   display: flex;
@@ -705,21 +593,14 @@
   align-items: center;
 
   gap: 8px;
-
 }
 
 .text-input,
-
 .input-field,
-
 .textarea-field,
-
 .select-field,
-
 .payment-select,
-
 .payment-select-inline {
-
   width: 100%;
 
   min-width: 0;
@@ -745,53 +626,35 @@
   line-height: 1.4;
 
   transition:
-
     border-color 0.18s,
-
     box-shadow 0.18s,
-
     background 0.18s;
-
 }
 
 .text-input::placeholder,
-
 .input-field::placeholder,
-
 .textarea-field::placeholder {
-
   color: #9aa6b5;
-
 }
 
 .text-input:focus,
-
 .input-field:focus,
-
 .textarea-field:focus,
-
 .select-field:focus,
-
 .payment-select:focus,
-
 .payment-select-inline:focus {
-
   border-color: var(--blue);
 
   box-shadow: 0 0 0 3px rgba(57, 136, 245, 0.12);
-
 }
 
 .textarea-field {
-
   min-height: 90px;
 
   resize: vertical;
-
 }
 
 .mic-btn {
-
   width: 44px;
 
   height: 44px;
@@ -813,21 +676,13 @@
   font-size: 17px;
 
   cursor: pointer;
-
 }
 
-
-
 .btn-primary,
-
 .btn-secondary-text,
-
 .btn-history-link,
-
 .btn-emergency-primary,
-
 .btn-emergency-outline {
-
   width: 100%;
 
   min-height: 44px;
@@ -865,55 +720,39 @@
   -webkit-appearance: none;
 
   transition:
-
     background 0.18s,
-
     transform 0.18s,
-
     opacity 0.18s;
-
 }
 
 .btn-primary {
-
   background: var(--blue);
 
   color: #fff;
 
   box-shadow: 0 4px 10px rgba(57, 136, 245, 0.2);
-
 }
 
 .btn-primary:hover:not(:disabled) {
-
   background: var(--blue-hover);
-
 }
 
 .btn-primary:active,
-
 .btn-secondary-text:active,
-
 .btn-history-link:active {
-
   transform: scale(0.985);
-
 }
 
 .btn-primary:disabled {
-
   opacity: 0.45;
 
   cursor: not-allowed;
 
   box-shadow: none;
-
 }
 
 .btn-secondary-text,
-
 .btn-history-link {
-
   min-height: 39px;
 
   padding: 8px 12px;
@@ -923,19 +762,15 @@
   background: var(--surface);
 
   color: var(--muted);
-
 }
 
 .btn-history-link {
-
   background: var(--surface-soft);
 
   color: var(--text);
-
 }
 
 .btn-back {
-
   align-self: flex-start;
 
   padding: 7px 0;
@@ -949,19 +784,13 @@
   font-size: 12px;
 
   cursor: pointer;
-
 }
 
 .btn-back:hover {
-
   color: var(--blue);
-
 }
 
-
-
 .body-selector-container {
-
   display: flex;
 
   justify-content: center;
@@ -971,11 +800,9 @@
   gap: 24px;
 
   padding: 4px 0;
-
 }
 
 .body-column {
-
   display: flex;
 
   flex-direction: column;
@@ -983,43 +810,33 @@
   align-items: center;
 
   gap: 5px;
-
 }
 
 .body-label {
-
   color: var(--muted);
 
   font-size: 11px;
-
 }
 
 .body-svg {
-
   width: 104px;
 
   height: 190px;
 
   overflow: visible;
-
 }
 
 .body-part {
-
   cursor: pointer;
 
   transition: opacity 0.15s;
-
 }
 
 .body-part:hover {
-
   opacity: 0.75;
-
 }
 
 .selected-tags {
-
   padding: 9px 11px;
 
   border-radius: 10px;
@@ -1029,13 +846,9 @@
   color: var(--blue);
 
   font-size: 11px;
-
 }
 
-
-
 .section-block {
-
   display: flex;
 
   flex-direction: column;
@@ -1043,21 +856,17 @@
   gap: 9px;
 
   padding: 13px;
-
 }
 
 .block-label {
-
   color: var(--muted);
 
   font-size: 12px;
 
   font-weight: 650;
-
 }
 
 .toggle-row {
-
   min-height: 42px;
 
   display: flex;
@@ -1075,17 +884,13 @@
   color: var(--text);
 
   font-size: 12px;
-
 }
 
 .toggle-row:last-child {
-
   border-bottom: 0;
-
 }
 
 .yes-no-group {
-
   flex: 0 0 auto;
 
   display: inline-flex;
@@ -1097,11 +902,9 @@
   border-radius: 9px;
 
   background: var(--surface-muted);
-
 }
 
 .yn-btn {
-
   min-width: 39px;
 
   padding: 6px 8px;
@@ -1117,29 +920,23 @@
   font-size: 11px;
 
   cursor: pointer;
-
 }
 
 .yn-btn.active {
-
   background: var(--blue);
 
   color: #fff;
-
 }
 
 .chips-row {
-
   display: flex;
 
   flex-wrap: wrap;
 
   gap: 7px;
-
 }
 
 .chip-btn {
-
   padding: 7px 11px;
 
   border: 1px solid var(--border);
@@ -1153,23 +950,17 @@
   font-size: 11px;
 
   cursor: pointer;
-
 }
 
 .chip-btn.active {
-
   border-color: var(--blue);
 
   background: var(--blue-soft);
 
   color: var(--blue);
-
 }
 
-
-
 .result-row {
-
   min-height: 48px;
 
   display: flex;
@@ -1183,11 +974,9 @@
   padding: 9px 2px;
 
   border-bottom: 1px solid var(--border);
-
 }
 
 .result-label {
-
   display: flex;
 
   align-items: center;
@@ -1197,11 +986,9 @@
   color: var(--muted);
 
   font-size: 12px;
-
 }
 
 .result-value {
-
   color: var(--text);
 
   font-size: 13px;
@@ -1209,21 +996,17 @@
   font-weight: 650;
 
   text-align: right;
-
 }
 
 .urgency-wrapper {
-
   display: flex;
 
   justify-content: center;
 
   padding: 4px 0;
-
 }
 
 .urgency-badge {
-
   display: inline-flex;
 
   align-items: center;
@@ -1241,51 +1024,39 @@
   font-size: 11px;
 
   font-weight: 700;
-
 }
 
 .urgency-badge.urgency-red {
-
   background: #e74747;
 
   color: #fff;
-
 }
 
 .urgency-badge.urgency-orange {
-
   background: #ff9e2c;
 
   color: #fff;
-
 }
 
 .urgency-badge.urgency-green {
-
   background: #28b879;
 
   color: #fff;
-
 }
 
 .urgency-badge.urgency-teal {
-
   background: #259c9c;
 
   color: #fff;
-
 }
 
 .urgency-badge.small {
-
   padding: 5px 9px;
 
   font-size: 10px;
-
 }
 
 .reasoning-block {
-
   padding: 13px;
 
   border: 1px solid var(--border);
@@ -1293,11 +1064,9 @@
   border-radius: 13px;
 
   background: var(--surface-soft);
-
 }
 
 .reasoning-title {
-
   margin-bottom: 6px;
 
   color: var(--text);
@@ -1305,11 +1074,9 @@
   font-size: 13px;
 
   font-weight: 700;
-
 }
 
 .reasoning-text {
-
   margin: 0;
 
   color: var(--muted);
@@ -1317,11 +1084,9 @@
   font-size: 11px;
 
   line-height: 1.55;
-
 }
 
 .payment-inline {
-
   display: flex;
 
   align-items: center;
@@ -1333,11 +1098,9 @@
   color: var(--muted);
 
   font-size: 11px;
-
 }
 
 .payment-select-inline {
-
   width: auto;
 
   max-width: 58%;
@@ -1345,29 +1108,23 @@
   min-height: 36px;
 
   padding: 7px 25px 7px 9px;
-
 }
 
 .history-list {
-
   display: flex;
 
   flex-direction: column;
 
   gap: 10px;
-
 }
 
 .history-card {
-
   padding: 12px;
 
   box-shadow: none;
-
 }
 
 .history-card-top {
-
   display: flex;
 
   justify-content: space-between;
@@ -1377,19 +1134,15 @@
   gap: 8px;
 
   margin-bottom: 8px;
-
 }
 
 .history-date {
-
   color: var(--muted);
 
   font-size: 10px;
-
 }
 
 .history-rec {
-
   margin-bottom: 5px;
 
   color: var(--text);
@@ -1397,33 +1150,25 @@
   font-size: 12px;
 
   font-weight: 650;
-
 }
 
 .history-symptoms {
-
   color: var(--muted);
 
   font-size: 11px;
 
   line-height: 1.45;
-
 }
 
-
-
 .emergency-screen {
-
   justify-content: center;
 
   align-items: center;
 
   padding: 10px 0;
-
 }
 
 .emergency-card {
-
   width: 100%;
 
   padding: 22px 17px;
@@ -1443,11 +1188,9 @@
   background: var(--warning-bg);
 
   text-align: center;
-
 }
 
 .emergency-icon {
-
   width: 43px;
 
   height: 43px;
@@ -1465,11 +1208,9 @@
   font-size: 25px;
 
   font-weight: 800;
-
 }
 
 .emergency-title {
-
   margin: 0;
 
   color: var(--danger);
@@ -1479,13 +1220,10 @@
   line-height: 1.3;
 
   font-weight: 800;
-
 }
 
 .emergency-desc,
-
 .emergency-call-text {
-
   margin: 0;
 
   color: var(--text);
@@ -1493,47 +1231,35 @@
   font-size: 12px;
 
   line-height: 1.55;
-
 }
 
 .emergency-call-text strong {
-
   font-size: 20px;
-
 }
 
 .btn-emergency-primary {
-
   background: var(--danger);
 
   color: #fff;
-
 }
 
 .btn-emergency-outline {
-
   border: 1px solid var(--danger);
 
   background: transparent;
 
   color: var(--danger);
-
 }
 
 .emergency-note {
-
   margin: 0;
 
   color: var(--muted);
 
   font-size: 10px;
-
 }
 
-
-
 .mascot-footer {
-
   display: flex;
 
   justify-content: center;
@@ -1543,11 +1269,9 @@
   margin-top: auto;
 
   padding-top: 24px;
-
 }
 
 .mascot-footer svg {
-
   display: block;
 
   width: 88px;
@@ -1555,13 +1279,9 @@
   height: 88px;
 
   max-width: 100%;
-
 }
 
-
-
 .modal-overlay {
-
   position: fixed;
 
   inset: 0;
@@ -1579,11 +1299,9 @@
   background: rgba(12, 18, 28, 0.58);
 
   backdrop-filter: blur(4px);
-
 }
 
 .modal-card {
-
   position: relative;
 
   width: 100%;
@@ -1603,11 +1321,9 @@
   background: var(--surface);
 
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.22);
-
 }
 
 .modal-close {
-
   position: absolute;
 
   top: 12px;
@@ -1627,11 +1343,9 @@
   color: var(--muted);
 
   cursor: pointer;
-
 }
 
 .modal-title {
-
   margin: 0 0 18px;
 
   color: var(--text);
@@ -1641,21 +1355,17 @@
   font-size: 18px;
 
   font-weight: 700;
-
 }
 
 .modal-form {
-
   display: flex;
 
   flex-direction: column;
 
   gap: 10px;
-
 }
 
 .payment-row {
-
   display: flex;
 
   align-items: center;
@@ -1667,23 +1377,17 @@
   color: var(--muted);
 
   font-size: 12px;
-
 }
 
 .payment-label {
-
   flex: 0 0 auto;
-
 }
 
 .payment-select {
-
   max-width: 150px;
-
 }
 
 .toast-success {
-
   margin-top: 12px;
 
   padding: 10px;
@@ -1697,51 +1401,33 @@
   text-align: center;
 
   font-size: 12px;
-
 }
-
-
 
 /* Защита от сторонних/браузерных стилей кнопок */
 
 .app-shell button {
-
   font-family: inherit;
-
 }
 
 .app-shell button:not(.btn-back) {
-
   -webkit-tap-highlight-color: transparent;
-
 }
 
 .app-shell button:focus-visible,
-
 .app-shell input:focus-visible,
-
 .app-shell textarea:focus-visible,
-
 .app-shell select:focus-visible {
-
   outline: 3px solid rgba(57, 136, 245, 0.22);
 
   outline-offset: 2px;
-
 }
 
-
-
 @media (min-width: 600px) {
-
   .app-shell {
-
     padding: 20px 0;
-
   }
 
   .mobile-frame {
-
     min-height: calc(100dvh - 40px);
 
     border: 1px solid var(--border);
@@ -1749,96 +1435,64 @@
     border-radius: 24px;
 
     box-shadow: var(--shadow);
-
   }
-
 }
 
 @media (max-width: 360px) {
-
   .mobile-frame {
-
     padding-left: 13px;
 
     padding-right: 13px;
-
   }
 
   .category-card {
-
     min-height: 76px;
-
   }
 
   .result-value {
-
     max-width: 52%;
-
   }
 
   .toggle-row {
-
     font-size: 11px;
-
   }
-
 }
 
-
-
 /* Цвет человечков в зависимости от темы */
-
-
 
 /* Единый стиль встроенных SVG-иконок */
 
 .theme-toggle svg,
-
 .mic-btn svg,
-
 .modal-close svg,
-
 .btn-back svg,
-
 .result-label svg {
-
   display: block;
 
   flex: 0 0 auto;
-
 }
 
 .result-label {
-
   display: inline-flex;
 
   align-items: center;
 
   gap: 7px;
-
 }
 
 .disclaimer-banner > svg {
-
   flex: 0 0 auto;
-
 }
 
 .logo-circle {
-
   display: grid;
 
   place-items: center;
-
 }
 
 .body-svg {
-
   filter: none;
-
 }
-
-
 
 /* ===== Иконки =====
 
@@ -1849,7 +1503,6 @@
    (--text переопределяется в .app-shell[data-theme="dark"]). */
 
 .icon-mask {
-
   display: inline-block;
 
   flex: 0 0 auto;
@@ -1871,25 +1524,19 @@
   mask-size: contain;
 
   transition: background-color 0.2s ease;
-
 }
-
-
 
 /* Цветные иконки (например, «Внимание») не перекрашиваются:
 
    в обеих темах выглядят одинаково. */
 
 .icon-img {
-
   display: block;
 
   flex: 0 0 auto;
 
   object-fit: contain;
-
 }
-
 
 /* ===== Правки по ТЗ ===== */
 
@@ -1953,7 +1600,6 @@
   padding: 16px 0;
 }
 
-
 .category-label {
   font-weight: 400;
 }
@@ -1967,4 +1613,135 @@
   display: block;
   font-size: inherit;
   font-weight: 400;
+}
+
+/* ===== Кнопка "Назад": текст правее стрелки с нормальным отступом ===== */
+.btn-back {
+  align-self: flex-start;
+  padding: 7px 0;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-back:hover {
+  color: var(--blue);
+}
+
+/* ===== Отступ между кнопками в финальном экране ===== */
+.result-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+/* ===== Emergency: hover, белая вторая кнопка, читаемая нижняя надпись ===== */
+.btn-emergency-primary {
+  background: var(--danger);
+  color: #fff;
+}
+.btn-emergency-primary:hover:not(:disabled) {
+  opacity: 0.92;
+  transform: scale(0.985);
+}
+.btn-emergency-outline {
+  border: 1px solid var(--danger);
+  background: var(--surface);
+  color: var(--danger);
+}
+.btn-emergency-outline:hover:not(:disabled) {
+  background: var(--danger);
+  color: #fff;
+}
+.emergency-note {
+  margin: 0;
+  color: var(--text);
+  opacity: 0.7;
+  font-size: 10px;
+}
+
+/* ===== Экран ошибки бэкенда ===== */
+.error-screen {
+  justify-content: center;
+  align-items: center;
+  padding: 16px 0;
+}
+.error-card {
+  width: 100%;
+  padding: 22px 17px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 13px;
+  border: 1px solid var(--border);
+  border-radius: 19px;
+  background: var(--surface);
+  text-align: center;
+}
+.error-icon {
+  width: 43px;
+  height: 43px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--surface-muted);
+  color: var(--muted);
+  font-size: 22px;
+}
+.error-title {
+  margin: 0;
+  color: var(--text);
+  font-size: 19px;
+  line-height: 1.3;
+  font-weight: 800;
+}
+.error-desc {
+  margin: 0;
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.55;
+}
+.error-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+/* ===== Кнопка очистки истории ===== */
+.btn-danger-text {
+  min-height: 39px;
+  padding: 8px 12px;
+  border: 1px solid var(--danger);
+  background: transparent;
+  color: var(--danger);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 11px;
+  cursor: pointer;
+  width: 100%;
+  transition:
+    background 0.18s,
+    color 0.18s;
+}
+.btn-danger-text:hover {
+  background: var(--danger);
+  color: #fff;
+}
+
+/* ===== Приветствие на стартовом экране ===== */
+.user-greeting {
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
+.user-greeting strong {
+  color: var(--text);
+  font-weight: 650;
 }
