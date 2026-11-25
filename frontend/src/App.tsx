@@ -5,6 +5,7 @@ import type {
   HistoryItem,
   PaymentType,
   EmergencyAlert,
+  PatientCasePayload,
 } from "./types";
 import {
   fetchUserProfile,
@@ -59,7 +60,8 @@ export function App() {
   const [emergencyAlert, setEmergencyAlert] = useState<EmergencyAlert | null>(
     null,
   );
-  const [paymentPref, setPaymentPref] = useState<PaymentType>("Платно");
+  const [paymentPref, setPaymentPref] = useState<PaymentType>("ОМС");
+  const [lastPayload, setLastPayload] = useState<PatientCasePayload | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [history, setHistory] = useState<HistoryItem[]>(() => {
   const saved = localStorage.getItem("medved_history_v2");
@@ -168,7 +170,7 @@ const handleFinishTriage = async () => {
     if (customLocalization.trim())
       allLocalization.push(customLocalization.trim());
 
-    const triageResponse = await submitTriage({
+    const payload: PatientCasePayload = {
       category: category || "Общая жалоба",
       complaint_text: complaintText,
       localization: allLocalization.join(", "),
@@ -181,7 +183,10 @@ const handleFinishTriage = async () => {
       is_child: isChild,
       smoking,
       payment_preference: paymentPref,
-    });
+    };
+    setLastPayload(payload);
+
+    const triageResponse = await submitTriage(payload);
 
     setResult(triageResponse);
 
@@ -200,7 +205,11 @@ const handleFinishTriage = async () => {
         [category, ...allLocalization, complaintText]
           .filter(Boolean)
           .join(", ") || "общее недомогание",
-    };
+};
+
+
+
+
 const updatedHistory = [newHistoryItem, ...history];
 setHistory(updatedHistory);
 localStorage.setItem("medved_history_v2", JSON.stringify(updatedHistory));;
@@ -213,8 +222,18 @@ localStorage.setItem("medved_history_v2", JSON.stringify(updatedHistory));;
   }
 };
 
-  const handlePaymentChange = (newPref: PaymentType) => {
+  const handlePaymentChange = async (newPref: PaymentType) => {
     setPaymentPref(newPref);
+    if (!result || !lastPayload) return;
+    setIsLoading(true);
+    try {
+      const updated = await submitTriage({ ...lastPayload, payment_preference: newPref });
+      setResult(updated);
+    } catch {
+      alert("Не удалось обновить рекомендацию. Проверьте соединение.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleReset = () => {
@@ -231,6 +250,7 @@ localStorage.setItem("medved_history_v2", JSON.stringify(updatedHistory));;
     setIsPregnant(false);
     setSmoking(false);
     setResult(null);
+    setLastPayload(null);
     setScreen("start");
   };
 

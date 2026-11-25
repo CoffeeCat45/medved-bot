@@ -1,13 +1,14 @@
 import logging
 import yaml
 from pathlib import Path
+import re
 
 from core.safety import check_safety
 from core.schemas import PatientCase, TriageResult, Urgency
 
 logger = logging.getLogger(__name__)
 
-# 1. Загружаем правила
+# 1 Загружаем правила
 RULES_PATH = Path(__file__).resolve().parent.parent / "rules" / "triage_rules.yaml"
 
 with RULES_PATH.open("r", encoding="utf-8") as f:
@@ -44,14 +45,26 @@ def _raise(current: str, minimum: str | None) -> str:
 def _is_empty(value: str) -> bool:
     return _norm(value) in TRIAGE_RULES.get("empty_markers", [""])
 
+def _guess_localization(case: PatientCase) -> str:
+    # если локализацию не выбрали поиск её в тексте жалобы
+    if case.localization.strip():
+        return case.localization
+    text = _norm(case.complaint_text)
+    if not text:
+        return ""
+    for key in TRIAGE_RULES.get("localization_map", {}):
+        stem = key[:-1] if len(key) > 4 else key
+        if re.search(r"(?:^|[^а-я])" + re.escape(stem), text):
+            return key
+    return ""
 
 def route_patient(case: PatientCase) -> TriageResult:
     reasons = [] # объяснения
 
-    # 0. Слой безопасности: Red Flags важнее LLM и любой маршрутизации
+    # 0 RedFlags важнее LLM
     parts = [case.complaint_text, case.localization]
-    loc = _norm(case.localization)
-    # локализация выбрана кнопкой, текста нет - все равно проверяем грудь
+    loc = _norm(_guess_localization(case))
+    # локализация выбрана кнопкой, текста нет все равно проверяем грудь
     if _norm(case.category) in ("боль", "сердце") and "груд" in loc:
         parts.append("боль в груди")
 
@@ -70,7 +83,7 @@ def route_patient(case: PatientCase) -> TriageResult:
             disclaimer=TRIAGE_RULES["disclaimers"]["emergency"],
         )
 
-    # 2. берем базовое правило по категории
+    # 2 берем базовое правило по категории
     category_key = _norm(case.category)
     categories = TRIAGE_RULES["categories"]
     if category_key in categories:
@@ -86,7 +99,7 @@ def route_patient(case: PatientCase) -> TriageResult:
     place = base_rule["place"]
     urgency_str = base_rule["urgency"]
 
-    # 3. уточняем специалиста по локализации
+    # 3 уточняем специалиста по локализации
     text_norm = _norm(case.complaint_text)
     if loc:
         for key, rule in TRIAGE_RULES.get("localization_map", {}).items():
@@ -143,14 +156,14 @@ def route_patient(case: PatientCase) -> TriageResult:
     if not _is_empty(case.medications):
         reasons.append(anam["medications"]["reason"])
 
-    # 6. затяжное течение в свободном тексте
+    # 6 затяжное течение в свободном тексте
     for block in TRIAGE_RULES.get("severity_keywords", []):
         if any(_norm(k) in text_norm for k in block.get("keywords", [])):
             urgency_str = _raise(urgency_str, block.get("urgency_min"))
             reasons.append(block["reason"])
             break
 
-    # 7. особые группы пациентов
+    # 7 особые группы пациентов
     if case.is_child:
         mod = TRIAGE_RULES["modifiers"]["child"]
         # хирурга/офтальмолога/кардиолога педиатром не подменяем
@@ -167,7 +180,7 @@ def route_patient(case: PatientCase) -> TriageResult:
             specialist = mapped
         reasons.append(mod["reason"])
 
-    # 8. место обращения: телемедицина и аптека только для легких случаев
+    # 8 место обращения: телемедицина и аптека только для легких случаев
     guards = TRIAGE_RULES.get("place_guards", {})
     remote_blocked = (
         urgency_str in guards.get("remote_blocked_urgency", [])
@@ -187,7 +200,7 @@ def route_patient(case: PatientCase) -> TriageResult:
             reasons.append(rule["reason"])
             break
 
-    # 9. тип оплаты влияет только при низкой срочности и только вместо поликлиники
+    # 9 тип оплаты влияет только при низкой срочности и только вместо поликлиники
     if case.payment_preference:
         pay_key = case.payment_preference.value
         pay = TRIAGE_RULES.get("payment", {}).get(pay_key)
@@ -199,7 +212,7 @@ def route_patient(case: PatientCase) -> TriageResult:
             elif pay_key != "ОМС":
                 reasons.append("Тип оплаты не меняет маршрут: срочность важнее способа оплаты")
 
-    # 10. самопомощь: только уход, без препаратов и дозировок
+    # 10 самопомощь только уход, без препаратов и дозировок
     self_care, stop_signals = [], []
     sc = TRIAGE_RULES.get("self_care", {})
     if urgency_str in sc.get("allowed_urgency", []):
@@ -208,7 +221,7 @@ def route_patient(case: PatientCase) -> TriageResult:
         if sc.get("stop_action"):
             stop_signals.append(sc["stop_action"])
 
-    # 11. переводим из yaml в enum
+    # 11 yaml в enum
     urgency_enum = URGENCY_ENUM.get(urgency_str, Urgency.PLANNED)
 
     # 12. отдаем итог
