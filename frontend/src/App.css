@@ -1639,6 +1639,63 @@
   gap: 10px;
   width: 100%;
 }
+.auth-debug-banner {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  background: #fff3cd;
+  color: #664d03;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.selfcare-block,
+.stopsignals-block {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #f0f7f4;
+}
+
+.stopsignals-block {
+  background: #fff4e6;
+}
+
+.selfcare-title,
+.stopsignals-title {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: #2c3e50;
+}
+
+.selfcare-list,
+.stopsignals-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #374151;
+}
+
+.selfcare-list li,
+.stopsignals-list li {
+  margin-bottom: 4px;
+}
+
+/* Более равномерные отступы в форме записи */
+.modal-card {
+  padding: 26px 20px 20px;
+}
+.modal-form {
+  gap: 12px;
+}
+.modal-form .text-input {
+  min-height: 46px;
+}
 
 /* ===== Emergency: hover, белая вторая кнопка, читаемая нижняя надпись ===== */
 .btn-emergency-primary {
@@ -1745,3 +1802,5 @@
   color: var(--text);
   font-weight: 650;
 }
+
+

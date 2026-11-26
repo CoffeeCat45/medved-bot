@@ -100,33 +100,38 @@ async def get_triage(case: PatientCase):
 
 @app.get("/api/auth/me", response_model=UserProfile)
 async def get_user_data(authorization: str = Header(None)):
+    # токен из заголовка
     if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Нет токена")
+        logger.warning("AUTH stage=header detail=no_bearer")
+        raise HTTPException(status_code=401, detail="AUTH_NO_TOKEN: нет заголовка Authorization")
 
     token = authorization.removeprefix("Bearer ").strip()
     if not token:
-        raise HTTPException(status_code=401, detail="Пустой токен")
+        logger.warning("AUTH stage=header detail=empty_bearer")
+        raise HTTPException(status_code=401, detail="AUTH_NO_TOKEN: пустой Bearer-токен")
 
+    # запрос в CORE
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
             response = await client.get(
                 f"{CORE_URL}/api/v3/users/user-for-external-service",
                 params={"token": token},
-                headers={"Authorization": f"Bearer {token}"},
             )
     except httpx.RequestError as exc:
-        # только сетевые ошибки
-        logger.error("CORE недоступен: %s", type(exc).__name__)
-        raise HTTPException(status_code=503, detail="Сервер авторизации недоступен")
+        logger.error("AUTH stage=core detail=network error=%s", type(exc).__name__)
+        raise HTTPException(status_code=503, detail="AUTH_CORE_UNREACHABLE: сервис авторизации не отвечает")
 
+    logger.info("AUTH stage=core detail=status_%s", response.status_code)
+
+    # разбор ответа CORE
     if response.status_code in (401, 403):
-        raise HTTPException(status_code=401, detail="Токен недействителен или истёк")
+        raise HTTPException(status_code=401, detail="AUTH_TOKEN_REJECTED: CORE отклонил токен")
     if response.status_code != 200:
-        logger.error("CORE вернул статус %s", response.status_code)
-        raise HTTPException(status_code=502, detail=f"Ошибка сервиса авторизации: {response.status_code}")
+        logger.error("AUTH stage=core detail=error_status_%s", response.status_code)
+        raise HTTPException(status_code=502, detail=f"AUTH_CORE_ERROR: CORE вернул {response.status_code}")
 
     data = response.json()
-    # Минимизация ПД
+    logger.info("AUTH stage=ok detail=user_%s", (data.get("full_name") or {}).get("lastName", "?"))
     name = data.get("full_name") or {}
     return UserProfile(
         full_name=FullName(
@@ -137,7 +142,6 @@ async def get_user_data(authorization: str = Header(None)):
         birthDate=data.get("birthDate", ""),
         phone=data.get("phone", ""),
     )
-
 
 @app.post("/api/parse-text")
 async def parse_text(req: SymptomRequest):

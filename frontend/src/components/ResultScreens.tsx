@@ -60,6 +60,29 @@ export const FinalScreen: React.FC<FinalProps> = ({
       <div className="reasoning-title">Почему мы так решили</div>
       <p className="reasoning-text">{result.reasoning.join(" ")}</p>
     </div>
+
+        {result.self_care && result.self_care.length > 0 && (
+      <div className="selfcare-block">
+        <div className="selfcare-title">Рекомендации по уходу</div>
+        <ul className="selfcare-list">
+          {result.self_care.map((tip, i) => (
+            <li key={i}>{tip}</li>
+          ))}
+        </ul>
+      </div>
+    )}
+
+    {result.stop_signals && result.stop_signals.length > 0 && (
+      <div className="stopsignals-block">
+        <div className="stopsignals-title">Когда прекратить самопомощь и обратиться к врачу</div>
+        <ul className="stopsignals-list">
+          {result.stop_signals.map((s, i) => (
+            <li key={i}>{s}</li>
+          ))}
+        </ul>
+      </div>
+    )}
+
     <div className="payment-inline">
       <span>Форма обращения:</span>
       <select

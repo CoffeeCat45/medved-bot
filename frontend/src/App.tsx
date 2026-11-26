@@ -11,6 +11,7 @@ import {
   fetchUserProfile,
   checkRedFlags,
   submitTriage,
+  ApiError,
 } from "./api/mockBackend";
 import { BearMascot } from "./components/BearMascot";
 import { Icon } from "./components/Icons";
@@ -33,8 +34,22 @@ type ScreenStep =
   | "history"
   | "emergency"
   | "error";
-
+const AUTH_LABELS: Record<string, string> = {
+  NO_TOKEN_IN_URL:
+    "MAX не передал токен авторизации. Работаю в демо-режиме с тестовым профилем.",
+  AUTH_NO_TOKEN:
+    "Токен не дошёл до сервера. Работаю в демо-режиме с тестовым профилем.",
+  AUTH_TOKEN_REJECTED:
+    "Сервис авторизации отклонил токен. Работаю в демо-режиме с тестовым профилем.",
+  AUTH_CORE_UNREACHABLE:
+    "Сервис авторизации организаторов не отвечает. Работаю в демо-режиме с тестовым профилем.",
+  AUTH_CORE_ERROR:
+    "Сервис авторизации вернул ошибку. Работаю в демо-режиме с тестовым профилем.",
+  NETWORK: "Нет связи с сервером. Работаю в демо-режиме с тестовым профилем.",
+  UNKNOWN: "Неизвестная ошибка авторизации. Работаю в демо-режиме с тестовым профилем.",
+};
 export function App() {
+  const [authCode, setAuthCode] = useState<string | null>(null);
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [screen, setScreen] = useState<ScreenStep>("start");
   const [previousScreen, setPreviousScreen] = useState<ScreenStep>("step1");
@@ -76,9 +91,10 @@ export function App() {
     document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
 
-  useEffect(() => {
+    useEffect(() => {
     fetchUserProfile()
       .then((profile) => {
+        setAuthCode(null);
         if (profile?.full_name) {
           const { lastName, firstName, middleName } = profile.full_name;
           const fullName = [lastName, firstName, middleName]
@@ -93,8 +109,10 @@ export function App() {
           if (age < 18) setIsChild(true);
         }
       })
-      .catch(() => {
-        // профиль не загрузился — оставляем дефолтное имя
+      .catch((err: unknown) => {
+        const code = err instanceof ApiError ? err.code : "UNKNOWN";
+        setAuthCode(code);
+        console.warn("AUTH fail:", code, err);
       });
   }, []);
 
@@ -334,6 +352,12 @@ export function App() {
                 вызывайте скорую помощь!
               </span>
             </div>
+            {authCode && (
+              <div className="auth-debug-banner">
+                <Icon name="warning" size={20} />
+                <span>{AUTH_LABELS[authCode] || AUTH_LABELS.UNKNOWN}</span>
+              </div>
+            )}
             <div className="start-card">
               <div className="logo-circle">
                 <Icon name="stethoscope" size={34} />
